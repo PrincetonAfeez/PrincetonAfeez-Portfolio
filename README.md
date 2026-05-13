@@ -2,10 +2,10 @@
 
 A personal portfolio site that catalogues a hospitality operator's transition into Python and system architecture. Built as a Django + HTMX monolith, deployed to Railway, served at [princetonafeez.com](https://princetonafeez.com).
 
-[![CI](https://github.com/PrincetonAfeez/princetonafeez.com/actions/workflows/ci.yml/badge.svg)](https://github.com/PrincetonAfeez/princetonafeez.com/actions/workflows/ci.yml)
+[![CI](https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![Django](https://img.shields.io/badge/django-5.2-green.svg)](https://www.djangoproject.com/)
-[![Coverage](https://img.shields.io/badge/coverage-84.7%25-brightgreen.svg)](#testing)
+[![Coverage](https://img.shields.io/badge/coverage-87.9%25-brightgreen.svg)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
@@ -96,7 +96,7 @@ A more complete description of the site's purpose, audience, and information arc
 | Content Security Policy | `django-csp` 4.x with dict-based config, `'self'` only |
 | Logging | `python-json-logger` (prod) + standard library (dev) |
 | Error monitoring | Sentry (10% trace sampling, PII off) |
-| Testing | pytest, pytest-django, coverage (84.7%) |
+| Testing | pytest, pytest-django, coverage (87.9%) |
 | Linting | ruff |
 | Formatting | black |
 | Template linting | djlint |
@@ -118,8 +118,8 @@ Prerequisites:
 Clone and set up:
 
 ```bash
-git clone https://github.com/PrincetonAfeez/princetonafeez.com.git
-cd princetonafeez.com
+git clone https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio.git
+cd PrincetonAfeez-Portfolio
 
 python -m venv .venv
 source .venv/bin/activate            # macOS / Linux
@@ -150,7 +150,7 @@ Tailwind reads **`tailwind.config.cjs`** at the repository root (CommonJS, not `
 ## Project structure
 
 ```
-princetonafeez.com/
+PrincetonAfeez-Portfolio/
 ├── .env.example                     # Documented env vars (gitignored .env in practice)
 ├── .github/workflows/ci.yml         # GitHub Actions CI pipeline
 ├── content/
@@ -257,18 +257,18 @@ djlint pages/templates portfolio/templates --reformat
 
 ## Testing
 
-Tests live under each Django app's `tests/` directory and run via `pytest`. The test settings (`core/settings/test.py`) use an in-memory SQLite database and the MD5 password hasher for speed.
+Tests live under each Django app's `tests/` directory and run via `pytest`. The test settings (`core/settings/test.py`) use PostgreSQL when `DATABASE_URL` is set (CI), otherwise SQLite from `base.py`, plus the MD5 password hasher for speed.
 
 ```bash
 pytest                                # Run all tests
-pytest --cov=. --cov-report=term      # With coverage report
-pytest --cov=. --cov-fail-under=70    # Fail if coverage drops below 70%
+pytest --cov=core --cov=pages --cov=portfolio --cov-report=term-missing  # With coverage report (matches CI)
+pytest --cov=core --cov=pages --cov=portfolio --cov-fail-under=70        # Fail if coverage drops below 70%
 
 pytest portfolio/tests/test_models.py # Run a single file
 pytest -k "doc_url"                   # Run tests matching a name
 ```
 
-The CI pipeline enforces a 70% line coverage minimum. The build fails if coverage drops below that threshold. Current coverage is **88% with deliberate exclusions** — WSGI/ASGI entrypoints, `manage.py`, environment-specific settings files, and a handful of defensive error branches are excluded because they would either test Django itself or require contrived test setups for low-value coverage.
+The CI pipeline enforces a 70% line coverage minimum on `core`, `pages`, and `portfolio`. The build fails if coverage drops below that threshold. The latest broad local run (`pytest --cov=.`) reported **87.9%** overall; CI uses `--cov=core`, `--cov=pages`, and `--cov=portfolio` (same commands as above). WSGI/ASGI entrypoints, `manage.py`, and dev-only settings are thinly covered by design and are not the focus of the gate.
 
 Critical paths are explicitly covered:
 
@@ -448,7 +448,7 @@ The ADRs cover:
 - App detail pages with five deep-linked doc buttons
 - Contact via `mailto:` and LinkedIn
 - Production-grade hardening: security headers, CSP locked to `'self'`, HSTS, JSON logging, Sentry, fail-fast admin IP allowlist
-- 84.7% test coverage with all critical paths exercised
+- 87.9% test coverage with all critical paths exercised
 - WCAG 2.1 AA accessibility target (semantic HTML, skip-to-content, `aria-live` on dynamic content)
 - Deployed to Railway at `princetonafeez.com` with HTTPS
 
@@ -485,6 +485,6 @@ The content of the site (work history, biography, app descriptions, documentatio
 
 **Princeton Afeez** — Senior General Manager, Los Angeles
 **Email:** [princetonafeez@gmail.com](mailto:princetonafeez@gmail.com)
-**LinkedIn:** [linkedin.com/in/princetonai](https://www.linkedin.com/in/princetonai
+**LinkedIn:** [linkedin.com/in/princetonai](https://www.linkedin.com/in/princetonai)
 **GitHub:** [github.com/PrincetonAfeez](https://github.com/PrincetonAfeez)
 **Live site:** [princetonafeez.com](https://princetonafeez.com)
