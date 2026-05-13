@@ -1,0 +1,15 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#profile-page",
+  "url": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/",
+  "name": "Princeton Afeez Portfolio",
+  "description": "A personal portfolio showcasing Princeton Afeez's projects, skills, and contact information.",
+  "about": {
+    "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#person"
+  },
+  "isPartOf": {
+    "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#website"
+  },
+  "inLanguage": "en"
+}

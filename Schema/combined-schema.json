@@ -1,0 +1,53 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#person",
+      "name": "Princeton Afeez",
+      "alternateName": "Princeton",
+      "url": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/",
+      "sameAs": [
+        "https://github.com/PrincetonAfeez"
+      ],
+      "jobTitle": "Student",
+      "description": "Portfolio website for Princeton Afeez."
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#website",
+      "name": "Princeton Afeez Portfolio",
+      "url": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/",
+      "publisher": {
+        "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#person"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#profile-page",
+      "url": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/",
+      "name": "Princeton Afeez Portfolio",
+      "description": "A personal portfolio showcasing Princeton Afeez's projects, skills, and contact information.",
+      "about": {
+        "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#person"
+      },
+      "isPartOf": {
+        "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#website"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://princetonafeez.github.io/PrincetonAfeez-Portfolio/"
+        }
+      ]
+    }
+  ]
+}
