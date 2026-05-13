@@ -1,0 +1,46 @@
+Five "Documentation" buttons, each deep-linking to the relevant H2 anchor in the app's single Markdown documentation file on GitHub
+
+
+1 | String Sanitizer | 2026-04-01 | https://github.com/PrincetonAfeez/String-Sanitizer/blob/main/string_sanitizer_docs.md
+2 | HTML Sanitizer | 2026-04-02 | https://github.com/PrincetonAfeez/HTML-Sanitizer/blob/main/html_sanitizer_docs.md
+3 | Contact Extractor | 2026-04-03 | https://github.com/PrincetonAfeez/Contact-Extractor/blob/main/contact_extractor_docs.md
+4 | CSV Converter  | 2026-04-04 | https://github.com/PrincetonAfeez/CSV-Converter/blob/main/csv_converter_docs.md
+5 | Log Parser  | 2026-04-05 | https://github.com/PrincetonAfeez/Log-Parser/blob/main/log_parser_docs.md
+6 | Password Checker  | 2026-04-06 | https://github.com/PrincetonAfeez/Password-Checker/blob/main/password_checker_docs.md
+7 | Dataguard  | 2026-04-07 | https://github.com/PrincetonAfeez/Dataguard/blob/main/dataguard_docs.md
+8 | Budget | 2026-04-08 | https://github.com/PrincetonAfeez/Budget/blob/main/budget_docs.md
+9 | Change Maker | 2026-04-09 | https://github.com/PrincetonAfeez/Change-Maker/blob/main/change_maker_docs.md
+10 | Investment  | 2026-04-10 | https://github.com/PrincetonAfeez/Investment/blob/main/investment_docs.md
+11 | Categorizer | 2026-04-11 | https://github.com/PrincetonAfeez/Categorizer/blob/main/categorizer_docs.md
+12 | Reconciler | 2026-04-12 | https://github.com/PrincetonAfeez/Reconciler/blob/main/reconciler_docs.md
+13 | Analyzer | 2026-04-13 | https://github.com/PrincetonAfeez/Analyzer/blob/main/analyzer_docs.md
+14 | Ledger Logic | 2026-04-14 | https://github.com/PrincetonAfeez/Ledger-Logic/blob/main/ledger_logic_docs.md
+15 | Devices | 2026-04-15 | https://github.com/PrincetonAfeez/Devices/blob/main/devices_docs.md
+16 | Access | 2026-04-16 | https://github.com/PrincetonAfeez/Access/blob/main/access_docs.md
+17 | Vault | 2026-04-17 | https://github.com/PrincetonAfeez/Vault/blob/main/vault_docs.md
+18 | Personnel | 2026-04-18 | https://github.com/PrincetonAfeez/Personnel/blob/main/personnel_docs.md
+19 | Events | 2026-04-19 | https://github.com/PrincetonAfeez/Events/blob/main/events_docs.md
+20 | Invites | 2026-04-20 | https://github.com/PrincetonAfeez/Invites/blob/main/invites_docs.md
+21 | Vault OS | 2026-04-21 | https://github.com/PrincetonAfeez/Vault-OS-Facility/blob/main/vault_os_facility_docs.md
+22 | Daily Briefing Generator | 2026-04-22 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/briefing/briefing_docs.md
+23 | Configuration Manager | 2026-04-23 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/config/config_docs.md
+24 | Markdown-to-HTML Generator | 2026-04-24 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/mdhtml/mdhtml_docs.md
+25 | System Health Monitor | 2026-04-25 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/monitor/monitor_docs.md
+26 | Folder Organizer | 2026-04-26 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/organizer/organizer_docs.md
+27 | Time Tracker | 2026-04-27 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/timetracker/timetracker_docs.md
+28 | SysForge | 2026-04-28 | https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/sysforge_docs.md
+29 | Age Calculator | 2026-04-29 | https://github.com/PrincetonAfeez/Age-Calculator/blob/main/age_calculator_docs.md
+30 | Anagram Detector | 2026-04-20 | https://github.com/PrincetonAfeez/Anagram-Detector/blob/main/anagram_detector_docs.md
+31 | Binary Search Visualizer | 2026-04-21 | https://github.com/PrincetonAfeez/Binary-Search-Visualizer/blob/main/binary_search_visualizer_docs.md
+32 | Calculator | 2026-04-22 | https://github.com/PrincetonAfeez/Calculator_v2/blob/main/calculator_docs.md
+33 | Countdown Timer | 2026-04-23 | https://github.com/PrincetonAfeez/Countdown-Timer/blob/main/countdown_timer_docs.md
+34 | Digital Clock | 2026-04-24 | https://github.com/PrincetonAfeez/Digital-Clock/blob/main/digital_clock_docs.md
+35 | Frequency Counter | 2026-04-25 | https://github.com/PrincetonAfeez/Frequency-Counter/blob/main/frequency_counter_docs.md
+36 | Tic Tac Toe | 2026-04-26 | https://github.com/PrincetonAfeez/Tic-Tac-Toe/blob/main/tic_tac_toe_docs.md
+37 | Unit Converter | 2026-04-27 | https://github.com/PrincetonAfeez/Unit-Converter/blob/main/unit_converter_docs.md
+38 | Virtual Vending Machine | 2026-04-28 | https://github.com/PrincetonAfeez/Virtual-Vending-Machine/blob/main/virtual_vending_machine_docs.md
+39 | Word Counter | 2026-04-29 | https://github.com/PrincetonAfeez/Word-Counter/blob/main/word_counter_docs.md
+40 | Plate Validator | 2026-04-20 | https://github.com/PrincetonAfeez/Plate-Validator_v1/blob/main/plate_validator_docs.md
+
+
+

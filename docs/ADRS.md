@@ -202,7 +202,7 @@ The site is also intended to be a credible HTMX demonstration. The author has no
 
 The catalogue uses HTMX-driven infinite scroll for the primary path and progressive enhancement to fall back to traditional pagination when JavaScript is disabled. A single Django view handles both paths.
 
-On initial load, the catalogue renders the first ten apps. Below the last card, an HTMX trigger element with `hx-trigger="revealed"` fires when scrolled into view, fetching the next ten cards as a partial template. The server distinguishes partial requests from full-page requests via the `HX-Request` header. The trigger element also contains a `<noscript>` element wrapping a real anchor link to `?page=2`, which the same view handles by rendering the full page template with the requested page.
+On initial load, the catalogue renders the first ten apps. Below the last card, an HTMX sentinel with `hx-trigger="revealed"` fires when scrolled into view, fetching the next ten cards as a partial template. The server distinguishes partial requests from full-page requests via the `HX-Request` header. A **`<noscript>`** block with a real anchor to `?page=2` sits **outside** the `aria-hidden` HTMX wrapper so the no-JavaScript path stays available to assistive technologies; the same view renders the full page template for that navigation.
 
 The HTMX-loaded content is announced to assistive technologies via an `aria-live="polite"` region wrapping the app list.
 
@@ -290,13 +290,13 @@ The file `content/apps.yaml` in this repository is the canonical source of truth
 
 A management command, `python manage.py seed_apps`, reads `apps.yaml` and upserts the database. The command is idempotent: running it on a clean database produces the same state as running it on a populated database. It creates or updates `Stack` and `Concept` rows from top-level taxonomy sections, then creates or updates `App` rows by slug and attaches each app to taxonomy entries by slug.
 
-The command runs as part of the Railway build pipeline, after `migrate` and before the application starts. Every deploy reflects the current state of `apps.yaml`. The Django admin remains enabled and functional, but is treated as an escape hatch for emergency edits rather than the primary content workflow.
+The command runs in Railway’s **`preDeployCommand`** (with `DATABASE_URL` available), chained after **`migrate`** and before new application containers start serving traffic — not during the image **build**, which only compiles assets and runs **`collectstatic`**. Every successful deploy reflects the current state of `apps.yaml`. The Django admin remains enabled and functional, but is treated as an escape hatch for emergency edits rather than the primary content workflow.
 
 ### Consequences
 
 **Positive.** The catalogue is diff-able. Pull requests for catalogue changes are reviewable like code changes. The catalogue survives database wipes — a fresh deploy with an empty database becomes a fully-populated catalogue after the seed step. Local development and production use the same canonical content without dump-and-restore workflows. The repository tells the full story of the portfolio, not just the site that renders it. The catalogue can be regenerated in another database technology, another host, another framework, without losing data.
 
-**Negative.** Two sources of truth exist if a future maintainer uses the admin and forgets to backport the change to `apps.yaml`. Mitigated by treating admin as escape-hatch only and by documenting the workflow in the README; not eliminated. The build pipeline now includes a seed step, slightly slowing deploys. The seed command must be maintained as a real piece of code (with tests) rather than a one-off script.
+**Negative.** Two sources of truth exist if a future maintainer uses the admin and forgets to backport the change to `apps.yaml`. Mitigated by treating admin as escape-hatch only and by documenting the workflow in the README; not eliminated. The deploy pipeline runs **`seed_apps`** in **pre-deploy** (after migrations), which adds a short step before new containers start. The seed command must be maintained as a real piece of code (with tests) rather than a one-off script.
 
 YAML editing is more friction than admin form editing for non-developers. This is acceptable because the catalogue is maintained by the author, who is a developer.
 

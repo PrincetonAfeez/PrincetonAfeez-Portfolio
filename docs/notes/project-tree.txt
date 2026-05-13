@@ -1,0 +1,112 @@
+princetonafeez/
++-- .github/
+|   `-- workflows/
+|       `-- ci.yml
++-- content/
+|   +-- apps.yaml
+|   +-- content.txt
+|   +-- README.md
+|   `-- technical docs.txt
++-- core/
+|   +-- settings/
+|   |   +-- __init__.py
+|   |   +-- base.py
+|   |   +-- dev.py
+|   |   +-- prod.py
+|   |   `-- test.py
+|   +-- __init__.py
+|   +-- asgi.py
+|   +-- context_processors.py
+|   +-- logging_config.py
+|   +-- middleware.py
+|   +-- sitemaps.py
+|   +-- urls.py
+|   `-- wsgi.py
++-- docs/
+|   +-- ADRS.md
+|   +-- project-tree.txt
+|   +-- README.md
+|   `-- SPEC.md
++-- logs/
+|   +-- devserver.err.log
+|   `-- devserver.out.log
++-- pages/
+|   +-- templates/
+|   |   +-- components/
+|   |   +-- layouts/
+|   |   +-- pages/
+|   |   +-- sections/
+|   |   +-- 404.html
+|   |   +-- 500.html
+|   |   `-- base.html
+|   +-- templatetags/
+|   |   +-- __init__.py
+|   |   `-- nav_tags.py
+|   +-- tests/
+|   |   +-- __init__.py
+|   |   +-- test_template_tags.py
+|   |   `-- test_views.py
+|   +-- __init__.py
+|   +-- apps.py
+|   +-- content.py
+|   +-- urls.py
+|   `-- views.py
++-- portfolio/
+|   +-- management/
+|   |   +-- commands/
+|   |   `-- __init__.py
+|   +-- migrations/
+|   |   +-- 0001_initial.py
+|   |   `-- __init__.py
+|   +-- templates/
+|   |   `-- portfolio/
+|   +-- templatetags/
+|   |   +-- __init__.py
+|   |   `-- doc_tags.py
+|   +-- tests/
+|   |   +-- __init__.py
+|   |   +-- test_models.py
+|   |   +-- test_seed_apps.py
+|   |   +-- test_template_tags.py
+|   |   +-- test_urls.py
+|   |   `-- test_views.py
+|   +-- __init__.py
+|   +-- admin.py
+|   +-- apps.py
+|   +-- models.py
+|   +-- urls.py
+|   `-- views.py
++-- requirements/
+|   +-- base.txt
+|   +-- dev.txt
+|   `-- prod.txt
++-- static/
+|   +-- css/
+|   |   +-- site.css
+|   |   +-- tw-compiled.css
+|   |   `-- tw-input.css
+|   +-- img/
+|   |   +-- headshot.png
+|   |   `-- README.md
+|   +-- js/
+|   |   `-- icons-init.js
+|   +-- resume/
+|   |   +-- README.md
+|   |   `-- resume.pdf
+|   `-- vendor/
+|       +-- htmx.min.js
+|       `-- lucide.min.js
++-- .coverage
++-- .env.example
++-- .gitignore
++-- CONTRIBUTING.md
++-- db.sqlite3
++-- manage.py
++-- package-lock.json
++-- package.json
++-- pyproject.toml
++-- railway.toml
++-- README.md
++-- SECURITY.md
++-- tailwind.config.cjs
+`-- VERSION

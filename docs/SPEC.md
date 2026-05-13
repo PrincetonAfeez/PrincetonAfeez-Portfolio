@@ -601,7 +601,7 @@ base.html
         └── portfolio/app_detail.html
 ```
 
-`base.html` defines the document skeleton: `<html>`, `<head>` with named blocks for title, meta description, OG tags, Twitter card, canonical URL; loads compiled Tailwind (`tw-compiled.css`) plus project CSS (`site.css`); loads HTMX and Lucide as self-hosted scripts from `static/vendor/` and a small `icons-init.js`; defines CSS custom properties for design tokens; opens a single `{% block content %}` and `{% block scripts %}`.
+`base.html` defines the document skeleton: `<html>`, `<head>` with named blocks for title, meta description, OG tags, Twitter card, canonical URL and `og:url` using the request path **without** query parameters; loads compiled Tailwind (`tw-compiled.css`) plus project CSS (`site.css`); loads HTMX and Lucide as self-hosted scripts from `static/vendor/` and a small `icons-init.js`; defines CSS custom properties for design tokens; opens a single `{% block content %}` and `{% block scripts %}`.
 
 `layouts/default.html` extends `base.html`, includes the navbar and footer components, wraps `{% block page_content %}` in the marketing-page container styling.
 
@@ -822,6 +822,7 @@ Scripts and styles are limited to first-party static files: compiled Tailwind + 
 
 Django admin is enabled for content edits but is not the primary content workflow. The seed manifest is. To minimize admin exposure:
 
+- Production **`SECRET_KEY`** must be set to a strong unique value; missing, blank, or the `INSECURE_DEFAULT_SECRET_KEY` dev fallback from `base.py` raises **`ImproperlyConfigured`** at settings import (see §8 `core.settings.prod`).
 - Superuser credentials are strong (16+ char password, env-derived).
 - The admin URL is not the default `/admin/` — it is randomized via env (e.g., `/control-9aB4xQ/`) and documented in `.env.example` as a configuration value.
 - An IP allowlist middleware (`AdminIPAllowlistMiddleware` in `core/middleware.py`) restricts admin access to Princeton's known IP addresses; non-allowlisted requests to admin URLs return 404. Production settings require a non-empty `ADMIN_ALLOWED_IPS` (startup fails with `ImproperlyConfigured` if unset or empty); a regression test in `core/tests/test_prod_settings.py` exercises this contract.
@@ -1004,6 +1005,8 @@ The 70% floor is the safety net; 87.9% is the actual quality bar maintained by t
 
 `.github/workflows/ci.yml` runs on every push and pull request to `main`:
 
+Representative excerpt — the source of truth is [`.github/workflows/ci.yml`](../.github/workflows/ci.yml):
+
 ```yaml
 name: CI
 on:
@@ -1011,16 +1014,28 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DJANGO_SETTINGS_MODULE: core.settings.test
+      SECRET_KEY: ci-not-for-production-use-only
     services:
       postgres:
         image: postgres:16
         env:
           POSTGRES_PASSWORD: postgres
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -1028,28 +1043,28 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
           cache: pip
-      - name: Install dependencies
-        run: pip install -r requirements/dev.txt
-      - name: Lint with ruff
-        run: ruff check .
-      - name: Check format with black
-        run: black --check .
-      - name: Lint templates with djlint
-        run: djlint pages/templates portfolio/templates --check
-      - name: Run migrations
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-          DJANGO_SETTINGS_MODULE: core.settings.test
-        run: python manage.py migrate
-      - name: Run tests with coverage
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-          DJANGO_SETTINGS_MODULE: core.settings.test
-        run: pytest --cov=. --cov-fail-under=70
+          cache-dependency-path: requirements/dev.txt
+      - run: npm ci && npm run build:css
+      - run: pip install --disable-pip-version-check -r requirements/dev.txt
+      - run: ruff check .
+      - run: black --check .
+      - run: djlint pages/templates portfolio/templates --check
+      - run: python -m playwright install chromium --with-deps
+      - run: python manage.py migrate
+      - run: python manage.py seed_apps
+      - env:
+          DJANGO_ALLOW_ASYNC_UNSAFE: "true"
+        run: >-
+          pytest --cov=core --cov=pages --cov=portfolio
+          --cov-report=term-missing --cov-fail-under=70
 ```
 
 ### Deployment

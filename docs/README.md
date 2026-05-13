@@ -4,9 +4,9 @@ A personal portfolio site that catalogues a hospitality operator's transition in
 
 [![CI](https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![Django](https://img.shields.io/badge/django-5.0-green.svg)](https://www.djangoproject.com/)
-[![Coverage](https://img.shields.io/badge/coverage-70%25%2B-brightgreen.svg)](#testing)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Django](https://img.shields.io/badge/django-5.2-green.svg)](https://www.djangoproject.com/)
+[![Coverage](https://img.shields.io/badge/coverage-87.9%25-brightgreen.svg)](#testing)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE)
 
 ---
 
@@ -45,7 +45,7 @@ A personal portfolio website that serves two distinct audiences.
 
 The site itself is the first Django + HTMX application Princeton has shipped to production. It is also the capstone project for twelve months of self-directed study in Python and system architecture. The choices documented here — the architecture, the data model, the deployment, the observability — are the artifact, not just the means.
 
-A more complete description of the site's purpose, audience, and information architecture lives in [`docs/SPEC.md`](docs/SPEC.md).
+A more complete description of the site's purpose, audience, and information architecture lives in [`SPEC.md`](SPEC.md).
 
 ---
 
@@ -95,13 +95,13 @@ A more complete description of the site's purpose, audience, and information arc
 | Registrar | GoDaddy |
 | Logging | `python-json-logger` (prod) + standard library (dev) |
 | Error monitoring | Sentry |
-| Testing | pytest, pytest-django, coverage |
+| Testing | pytest, pytest-django, coverage (~87.9% on `core`/`pages`/`portfolio` in CI) |
 | Linting | ruff |
 | Formatting | black |
 | Template linting | djlint |
 | CI | GitHub Actions |
 
-Every meaningful architectural choice is documented as an Architecture Decision Record. See [`docs/adr/`](docs/adr/) for the full set.
+Every meaningful architectural choice is documented as an Architecture Decision Record. See [`docs/ADRS.md`](ADRS.md) for ADR 0001–0007 (single compendium file).
 
 ---
 
@@ -177,7 +177,7 @@ PrincetonAfeez-Portfolio/
 │   └── templates/portfolio/         # app_list.html, app_detail.html, partials/
 ├── manage.py
 ├── pyproject.toml                   # Tool configuration (ruff, black, djlint, pytest)
-├── railway.toml                     # Railway deploy config
+├── railway.toml                     # Railway build, pre-deploy, and start commands
 ├── requirements/
 │   ├── base.txt                     # Shared dependencies
 │   ├── dev.txt                      # base + dev-only (debug toolbar, pytest, ruff, etc.)
@@ -187,7 +187,7 @@ PrincetonAfeez-Portfolio/
 
 Two Django apps inside one project: `pages` (the static marketing pages) and `portfolio` (the dynamic catalogue). Clean separation of concerns.
 
-The directory tree, with rationale for each layer, is documented in [`docs/SPEC.md`](docs/SPEC.md#7-project-structure).
+The directory tree, with rationale for each layer, is documented in [`SPEC.md` § 7](SPEC.md#7-project-structure).
 
 ---
 
@@ -209,13 +209,13 @@ python manage.py seed_apps
 
 ### Make a change to the catalogue
 
-The catalogue is version-controlled in [`content/apps.yaml`](content/apps.yaml). To add or modify an app:
+The catalogue is version-controlled in [`content/apps.yaml`](../content/apps.yaml). To add or modify an app:
 
 1. Edit `content/apps.yaml` (see [Adding an app to the catalogue](#adding-an-app-to-the-catalogue))
 2. Run `python manage.py seed_apps`
-3. Commit the YAML change. The deploy pipeline re-runs `seed_apps` automatically.
+3. Commit the YAML change. Each production deploy runs **`seed_apps`** in Railway’s **pre-deploy** step (after `migrate`), as configured in [`railway.toml`](../railway.toml).
 
-Why a manifest instead of the Django admin: see [ADR-0007](docs/adr/0007-content-sync-via-manifest.md).
+Why a manifest instead of the Django admin: see [ADR-0007 in `ADRS.md`](ADRS.md).
 
 ### Lint, format, check
 
@@ -245,18 +245,18 @@ Hooks run `ruff`, `black`, and `djlint` on every commit.
 
 ## Testing
 
-Tests live under each Django app's `tests/` directory and run via `pytest`.
+Tests live under each Django app's `tests/` directory and run via `pytest`. Test settings (`core.settings.test`) use PostgreSQL when `DATABASE_URL` is set (CI), otherwise SQLite from `base.py`.
 
 ```bash
 pytest                                # Run all tests
-pytest --cov=. --cov-report=term      # With coverage report
-pytest --cov=. --cov-fail-under=70    # Fail if coverage drops below 70%
+pytest --cov=core --cov=pages --cov=portfolio --cov-report=term-missing  # With coverage report (matches CI)
+pytest --cov=core --cov=pages --cov=portfolio --cov-fail-under=70        # Fail if coverage drops below 70%
 
 pytest portfolio/tests/test_models.py  # Run a single file
 pytest -k "doc_url"                   # Run tests matching a name
 ```
 
-The CI pipeline enforces a 70% line coverage minimum. The build fails if coverage drops below that threshold.
+The CI pipeline enforces a 70% line coverage minimum on `core`, `pages`, and `portfolio`. The latest broad local run (`pytest --cov=.`) reported about **87.9%** overall; the gate applies to the three app packages above.
 
 Critical paths are explicitly covered:
 
@@ -266,8 +266,9 @@ Critical paths are explicitly covered:
 - `active_link` and `doc_url` template tags
 - URL resolver — all named routes
 - `seed_apps` management command — create and update paths
+- Production settings — `SECRET_KEY` and `ADMIN_ALLOWED_IPS` enforcement (`ImproperlyConfigured` when misconfigured)
 
-See [`docs/SPEC.md` § 18](docs/SPEC.md#18-testing-strategy) for the complete test plan.
+See [`SPEC.md` § 18](SPEC.md#18-testing-strategy) for the complete test plan.
 
 ---
 
@@ -282,20 +283,28 @@ A new Railway project was created from this GitHub repository. PostgreSQL was ad
 | Variable | Example | Description |
 |---|---|---|
 | `DJANGO_SETTINGS_MODULE` | `core.settings.prod` | Selects production settings |
-| `SECRET_KEY` | (50+ random chars) | Django secret |
+| `SECRET_KEY` | (50+ random chars) | Strong unique secret; **must not** be empty or the dev default (`INSECURE_DEFAULT_SECRET_KEY` in `base.py`) — production raises `ImproperlyConfigured` |
 | `DATABASE_URL` | (auto-injected) | Provided by Railway PostgreSQL service |
 | `ALLOWED_HOSTS` | `princetonafeez.com,www.princetonafeez.com` | Comma-separated |
+| `CSRF_TRUSTED_ORIGINS` | `https://princetonafeez.com,https://www.princetonafeez.com` | Comma-separated, with scheme |
 | `DEBUG` | `False` | Never `True` in prod |
+| `ADMIN_ALLOWED_IPS` | Your public IP(s) | **Required** — comma-separated; empty = startup error |
 | `SENTRY_DSN` | (from sentry.io) | Error monitoring |
 | `ADMIN_URL_PREFIX` | `control-9aB4xQ` | Randomized admin URL segment |
 
-Build command:
+Build command (from [`railway.toml`](../railway.toml) — no database):
 
 ```bash
+npm ci && \
+npm run build:css && \
 pip install -r requirements/prod.txt && \
-python manage.py collectstatic --noinput && \
-python manage.py migrate && \
-python manage.py seed_apps
+python manage.py collectstatic --noinput
+```
+
+Pre-deploy command (migrations + catalogue sync, with `DATABASE_URL`):
+
+```bash
+python manage.py migrate && python manage.py seed_apps
 ```
 
 Start command:
@@ -313,7 +322,7 @@ The domain `princetonafeez.com` is registered at GoDaddy. DNS records point at R
 
 HTTPS certificates are issued and renewed automatically by Railway. The certificate covers both the apex and `www`.
 
-Why Railway and not GoDaddy hosting: see [ADR-0002](docs/adr/0002-postgres-on-railway.md).
+Why Railway and not GoDaddy hosting: see [ADR-0002 in `ADRS.md`](ADRS.md).
 
 ### Manual deploy (rarely needed)
 
@@ -328,13 +337,13 @@ git push
 
 ## Adding an app to the catalogue
 
-The catalogue is driven by [`content/apps.yaml`](content/apps.yaml). To add a new app:
+The catalogue is driven by [`content/apps.yaml`](../content/apps.yaml). To add a new app:
 
 1. **Open** `content/apps.yaml`.
 2. **Add a new entry** at the bottom of the `apps:` list. The `build_order` must be unique and is conventionally the next integer after the highest existing one.
 3. **Run** `python manage.py seed_apps` to update your local database.
 4. **Verify** the new app appears at the top of `/apps/` (reverse-chronological by `build_order`).
-5. **Commit** the YAML change. Deploys auto-trigger from `main`.
+5. **Commit** the YAML change. Pushes to `main` trigger CI and Railway; production runs `seed_apps` in **pre-deploy** after migrations.
 
 Entry format:
 
@@ -369,7 +378,7 @@ The `stack` and `concepts` arrays reference `Stack` and `Concept` rows by slug. 
 ...
 ```
 
-The site renders five buttons on each app's detail page, each deep-linking to the relevant H2 anchor on GitHub. See [ADR-0003](docs/adr/0003-five-docs-via-github-deep-links.md) for the full rationale.
+The site renders five buttons on each app's detail page, each deep-linking to the relevant H2 anchor on GitHub. See [ADR-0003 in `ADRS.md`](ADRS.md) for the full rationale.
 
 ---
 
@@ -378,21 +387,21 @@ The site renders five buttons on each app's detail page, each deep-linking to th
 | Document | Purpose |
 |---|---|
 | [`README.md`](README.md) | This file — orientation, setup, workflow |
-| [`docs/SPEC.md`](docs/SPEC.md) | Full v1 specification: positioning, architecture, content plan, security, accessibility |
-| [`docs/adr/`](docs/adr/) | Architecture Decision Records (seven for v1) |
-| [`SECURITY.md`](SECURITY.md) | Security disclosure contact |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines (primarily for future-Princeton) |
-| [`content/apps.yaml`](content/apps.yaml) | Canonical apps catalogue manifest |
+| [`SPEC.md`](SPEC.md) | Full v1 specification: positioning, architecture, content plan, security, accessibility |
+| [`ADRS.md`](ADRS.md) | Architecture Decision Records 0001–0007 (single compendium) |
+| [`../SECURITY.md`](../SECURITY.md) | Security disclosure contact |
+| [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | Contribution guidelines (primarily for future-Princeton) |
+| [`../content/apps.yaml`](../content/apps.yaml) | Canonical apps catalogue manifest |
 
-The ADRs cover:
+The ADRs in `ADRS.md` cover:
 
-- [0001 — Django + HTMX monolith](docs/adr/0001-django-htmx-monolith.md)
-- [0002 — PostgreSQL on Railway](docs/adr/0002-postgres-on-railway.md)
-- [0003 — Five docs via GitHub deep links](docs/adr/0003-five-docs-via-github-deep-links.md)
-- [0004 — M2M for Stack and Concept](docs/adr/0004-m2m-stack-and-concept.md)
-- [0005 — HTMX infinite scroll with pagination fallback](docs/adr/0005-htmx-infinite-scroll.md)
-- [0006 — Logging strategy](docs/adr/0006-logging-strategy.md)
-- [0007 — Content sync via manifest](docs/adr/0007-content-sync-via-manifest.md)
+- 0001 — Django + HTMX monolith
+- 0002 — PostgreSQL on Railway, GoDaddy as registrar only
+- 0003 — Five docs via GitHub deep links
+- 0004 — M2M for Stack and Concept
+- 0005 — HTMX infinite scroll with pagination fallback
+- 0006 — Logging strategy
+- 0007 — Content sync via manifest
 
 ---
 
@@ -404,7 +413,7 @@ The ADRs cover:
 - Apps catalogue with reverse-chronological list, HTMX infinite scroll, progressive-enhancement pagination fallback
 - App detail pages with five deep-linked doc buttons
 - Contact via `mailto:` and LinkedIn
-- Production-grade hardening: security headers, CSP, HSTS, JSON logging, Sentry, 70% test coverage, CI/CD
+- Production-grade hardening: security headers, CSP, HSTS, JSON logging, Sentry, production `SECRET_KEY` validation, admin IP allowlist, 70% CI coverage gate, CI/CD
 - WCAG 2.1 AA accessibility target
 - Deployed to Railway at `princetonafeez.com` with HTTPS
 
@@ -425,13 +434,13 @@ The ADRs cover:
 - RSS feed for new apps
 - Dark mode
 
-The full roadmap is in [`docs/SPEC.md` § 24](docs/SPEC.md#24-roadmap).
+The full roadmap is in [`SPEC.md` § 24](SPEC.md#24-roadmap).
 
 ---
 
 ## License
 
-MIT License. See [`LICENSE`](LICENSE) for the full text.
+MIT License. See [`LICENSE`](../LICENSE) for the full text.
 
 The content of the site (work history, biography, app descriptions, documentation) is © Princeton Afeez and is not covered by the MIT license. The MIT license covers the source code only.
 
