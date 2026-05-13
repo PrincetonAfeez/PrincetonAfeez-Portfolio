@@ -93,7 +93,7 @@ The decision was to build the portfolio as a Django + HTMX monolith with two Dja
 
 **Rejected:** One settings file with many conditionals.
 
-**Reason:** Local development, production, and test execution need different behavior. Development enables Debug Toolbar and permissive hosts. Production enables PostgreSQL via `DATABASE_URL`, WhiteNoise manifest storage, CSP middleware, secure cookies, HTTPS redirect, Sentry, JSON logs, and fail-fast admin IP allowlisting. Test settings use a faster password hasher and pytest-specific configuration.
+**Reason:** Local development, production, and test execution need different behavior. Development enables Debug Toolbar and permissive hosts. Production enables PostgreSQL via `DATABASE_URL`, WhiteNoise manifest storage, CSP middleware, secure cookies, HTTPS redirect, Sentry, JSON logs, and fail-fast checks for **`SECRET_KEY`** (no missing, empty, or dev-default value) and **`ADMIN_ALLOWED_IPS`** (non-empty allowlist). Test settings use a faster password hasher, locmem email, PostgreSQL when `DATABASE_URL` is set (e.g. CI), otherwise SQLite from `base.py`, and pytest-specific configuration.
 
 ---
 
@@ -109,11 +109,11 @@ The decision was to build the portfolio as a Django + HTMX monolith with two Dja
 
 ### Decision 10 — Railway deployment with PostgreSQL, Gunicorn, and WhiteNoise
 
-**Chosen:** Deploy on Railway using PostgreSQL, Gunicorn, WhiteNoise, collectstatic, migrations, and seed command during build/deploy.
+**Chosen:** Deploy on Railway using PostgreSQL, Gunicorn, and WhiteNoise. The **image build** compiles Tailwind, installs Python dependencies, and runs **`collectstatic`** only (no database required). **`migrate`** and **`seed_apps`** run in Railway’s **`preDeployCommand`** after the image exists, with `DATABASE_URL` available, before new containers serve traffic. **Gunicorn** starts via `startCommand`.
 
 **Rejected:** GoDaddy shared hosting, a manually managed VPS, or SQLite production.
 
-**Reason:** Railway supports GitHub-connected deployment, managed Postgres, environment variables, HTTPS, and stdout log aggregation with less operational burden. PostgreSQL is a credible production database. WhiteNoise lets Django serve static assets without another service.
+**Reason:** Railway supports GitHub-connected deployment, managed Postgres, environment variables, HTTPS, and stdout log aggregation with less operational burden. PostgreSQL is a credible production database. WhiteNoise lets Django serve static assets without another service. Separating DB mutations from the build avoids coupling image builds to database availability and keeps deploy semantics clearer.
 
 ---
 
@@ -370,7 +370,7 @@ core.settings.prod
   ├── sentry_sdk
   ├── django-csp
   ├── WhiteNoise manifest storage
-  └── ImproperlyConfigured admin allowlist check
+  └── ImproperlyConfigured checks (SECRET_KEY, admin IP allowlist)
 ```
 
 ---
@@ -617,7 +617,9 @@ Full catalogue page. Shows title, description, app count, GitHub link, and an `#
 
 ### `portfolio/partials/app_list_page.html`
 
-Renders app cards and, when another page exists, an HTMX trigger:
+Renders app cards and, when another page exists, an HTMX `revealed` sentinel plus a **`<noscript>`** “Load more” link. The **noscript block sits outside** the `aria-hidden` HTMX wrapper so the no-JavaScript fallback stays discoverable to assistive technologies.
+
+Example HTMX attributes on the sentinel:
 
 ```html
 hx-get="{% url 'portfolio:app_list' %}?page={{ next_page }}"
@@ -625,13 +627,17 @@ hx-trigger="revealed"
 hx-swap="outerHTML"
 ```
 
-Includes a `<noscript>` fallback link.
+---
+
+### `portfolio/partials/app_card.html`
+
+Catalogue card: build order label uses **`total_apps`** from the list view (e.g. “App #12 of {{ total_apps }}”), not a hardcoded catalogue size.
 
 ---
 
 ### `portfolio/app_detail.html`
 
-Renders app name, build order, status, description, GitHub link, five documentation buttons, stack chips, concept chips, and structured data.
+Renders app name, build order, status, description, GitHub link, five documentation buttons, stack chips, concept chips, and JSON-LD (`SoftwareApplication`). **`dateCreated`** is emitted only when **`completed_date`** is set. **`url`** in JSON-LD uses the request path without query string (same policy as site-wide canonical / `og:url` in `base.html`).
 
 ---
 
@@ -660,7 +666,7 @@ Renders app name, build order, status, description, GitHub link, five documentat
 
 - `.env` for local development
 - Railway variables for production
-- `ADMIN_ALLOWED_IPS` and `ADMIN_URL_PREFIX` for admin protection
+- `ADMIN_ALLOWED_IPS`, `ADMIN_URL_PREFIX`, and production **`SECRET_KEY`** validation (see `core.settings.prod`)
 
 ---
 
@@ -669,7 +675,7 @@ Renders app name, build order, status, description, GitHub link, five documentat
 - Missing app slugs return 404 through `get_object_or_404`.
 - Missing résumé PDF raises 404.
 - Disallowed admin IPs raise 404.
-- Production settings raise `ImproperlyConfigured` when `ADMIN_ALLOWED_IPS` is empty.
+- Production settings raise `ImproperlyConfigured` when `SECRET_KEY` is missing, empty after stripping, or equal to the development default (`INSECURE_DEFAULT_SECRET_KEY` in `core.settings.base`), or when `ADMIN_ALLOWED_IPS` is empty.
 - `seed_apps` raises `CommandError` for missing manifest or missing taxonomy references.
 - Custom 404 and 500 templates are configured.
 - Sentry initializes when `SENTRY_DSN` is present.
@@ -985,6 +991,7 @@ The project uses standard Django/npm/pytest exit behavior.
 - Custom 404/500 pages.
 - Disallowed admin IPs get 404.
 - Missing `ADMIN_ALLOWED_IPS` prevents startup.
+- Missing, blank, or insecure-default `SECRET_KEY` prevents startup (see `core.settings.prod`).
 
 ---
 
@@ -993,7 +1000,7 @@ The project uses standard Django/npm/pytest exit behavior.
 | Variable | Required | Description |
 |---|---|---|
 | `DJANGO_SETTINGS_MODULE` | Yes operationally | Settings module |
-| `SECRET_KEY` | Yes in production | Django secret |
+| `SECRET_KEY` | Yes in production | Strong Django secret. Must not be empty or the `INSECURE_DEFAULT_SECRET_KEY` dev fallback from `base.py` — production raises `ImproperlyConfigured`. |
 | `DEBUG` | No | Debug flag |
 | `ALLOWED_HOSTS` | Yes in production | Comma-separated hosts |
 | `CSRF_TRUSTED_ORIGINS` | Yes in production | Comma-separated trusted origins |
@@ -1017,7 +1024,7 @@ The project uses standard Django/npm/pytest exit behavior.
 | `requirements/prod.txt` | Production dependency include |
 | `package.json` | Node scripts/dependencies |
 | `tailwind.config.cjs` | Tailwind template scan config |
-| `railway.toml` | Railway build/start commands |
+| `railway.toml` | Railway `buildCommand`, `preDeployCommand`, and `startCommand` |
 | `pyproject.toml` | Black, Ruff, pytest, coverage, djlint config |
 
 ---
@@ -1032,7 +1039,9 @@ The project uses standard Django/npm/pytest exit behavior.
 | `collectstatic` | Writes collected assets to `STATIC_ROOT` |
 | `createsuperuser` | Creates admin user |
 | production boot with Sentry | Reports errors/traces to Sentry when configured |
-| Railway deploy | Installs/builds/collects/migrates/seeds/starts app |
+| Railway build | Installs Node deps, builds CSS, installs Python deps, runs `collectstatic` (no DB) |
+| Railway pre-deploy | Runs `migrate` then `seed_apps` against Postgres |
+| Railway start | Runs Gunicorn on `$PORT` |
 
 ---
 
@@ -1221,6 +1230,8 @@ ADMIN_URL_PREFIX=<randomized-prefix>
 SENTRY_DSN=<optional>
 ```
 
+`SECRET_KEY` must be a strong unique value: production startup fails if it is missing, whitespace-only, or exactly the development default defined as `INSECURE_DEFAULT_SECRET_KEY` in `core.settings.base`.
+
 ---
 
 ## Standard Operating Procedures
@@ -1281,18 +1292,22 @@ pytest --cov=core --cov=pages --cov=portfolio --cov-report=term-missing --cov-fa
 
 ### Production deploy
 
-Railway build runs:
+Railway **`buildCommand`** (from `railway.toml`) runs:
 
 ```bash
 npm ci
 npm run build:css
 pip install -r requirements/prod.txt
 python manage.py collectstatic --noinput
-python manage.py migrate
-python manage.py seed_apps
 ```
 
-Railway starts:
+Railway **`preDeployCommand`** runs (with `DATABASE_URL` and other service env vars):
+
+```bash
+python manage.py migrate && python manage.py seed_apps
+```
+
+Railway **`startCommand`** runs:
 
 ```bash
 gunicorn core.wsgi:application --workers 2 --bind 0.0.0.0:$PORT
@@ -1449,8 +1464,10 @@ npm run build:css
 
 ```text
 Site does not start
-  ├── Missing SECRET_KEY?
-  │     └── Set .env or environment variable
+  ├── Missing or insecure SECRET_KEY in production?
+  │     └── Set a long random `SECRET_KEY` in Railway (not the dev default string)
+  ├── Missing SECRET_KEY in dev?
+  │     └── Set `.env` or accept local fallback only for non-prod settings
   ├── Production ADMIN_ALLOWED_IPS missing?
   │     └── Set allowlist
   ├── Database failure?
@@ -1684,11 +1701,11 @@ The third weakness is dev/prod database asymmetry. SQLite is convenient locally,
 
 - **Progressive enhancement is practical.** HTMX infinite scroll improves browsing without breaking no-script fallback.
 
-- **Security belongs in small projects too.** Admin allowlisting, strict CSP, secure cookies, HSTS, HTTPS redirect, JSON logs, and Sentry are appropriate for a public portfolio.
+- **Security belongs in small projects too.** Admin allowlisting, production **`SECRET_KEY`** validation (no dev default), strict CSP, secure cookies, HSTS, HTTPS redirect, JSON logs, and Sentry are appropriate for a public portfolio.
 
 - **Tests should protect real user paths.** The tests cover pages, catalogue behavior, docs links, HTMX partials, seed command, résumé delivery, robots.txt, and error pages.
 
-- **Deployment is part of architecture.** Railway, Gunicorn, PostgreSQL, WhiteNoise, collectstatic, migrations, seeding, CI, and logging are all design decisions.
+- **Deployment is part of architecture.** Railway (build vs pre-deploy vs start), Gunicorn, PostgreSQL, WhiteNoise, `collectstatic`, migrations, seeding, CI, and logging are all design decisions.
 
 ---
 
