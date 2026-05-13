@@ -1,0 +1,24 @@
+<section class="section-band bg-white">
+    <div class="section-inner grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div>
+            <p class="section-kicker">The Technical Chapter</p>
+            <h2 class="section-title">Small apps, serious documentation.</h2>
+        </div>
+        <div class="space-y-5 text-base leading-8 text-[var(--color-ink)]">
+            <p>
+                After 35 years operating restaurants, I'm now studying Python and system architecture. I build small applications, most of them command-line tools, some of them web applications, to learn the disciplines that go into shipping software.
+            </p>
+            <p>
+                Every project ships with five documents: an Architecture Decision Record, a Technical Design Document, an Interface Design Specification, a Runbook, and a Lessons Learned retrospective.
+            </p>
+            <p>
+                The discipline is the point. The applications themselves are small. The catalog of decisions, designs, interfaces, runbooks, and reflections is the artifact.
+            </p>
+            <a class="inline-flex items-center gap-2 rounded bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-white hover:bg-[var(--color-accent-dark)]"
+               href="{% url 'portfolio:app_list' %}">
+                <span>Browse all apps</span>
+                <i class="h-4 w-4" data-lucide="arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</section>

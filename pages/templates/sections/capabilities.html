@@ -1,0 +1,26 @@
+<section class="section-band bg-white">
+    <div class="section-inner">
+        <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+                <p class="section-kicker">Capabilities</p>
+                <h2 class="section-title">The operating vocabulary.</h2>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                {% for capability in capabilities %}
+                    {% include "components/chip.html" with label=capability variant="chip-strong" %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="mt-12 grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+                <p class="section-kicker">Operator Tech Stack</p>
+                <h2 class="section-title">Tools used in real restaurants.</h2>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                {% for item in operator_stack %}
+                    {% include "components/chip.html" with label=item variant="chip-neutral" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,29 @@
+{% load static %}
+<section class="hero-section">
+    <img class="hero-image"
+         src="{% static 'img/headshot.png' %}"
+         alt="Princeton Afeez">
+    <div class="hero-overlay"></div>
+    <div class="relative mx-auto flex min-h-[78svh] max-w-6xl items-end px-4 pb-14 pt-28 sm:px-6 lg:pb-18">
+        <div class="max-w-3xl text-white">
+            <p class="mb-4 text-sm font-semibold uppercase">Senior General Manager · Los Angeles</p>
+            <h1 class="text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">Princeton Afeez</h1>
+            <p class="mt-5 max-w-2xl text-xl leading-8 text-white/92">
+                35 years operating bars, clubs and restaurants. 15+ years of multi-unit P&amp;L ownership.
+            </p>
+            <p class="mt-4 max-w-2xl text-lg leading-8 text-white/84">
+                Every role inherited a problem. Every role left behind a system.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a class="hero-button-primary" href="#contact">
+                    <i data-lucide="mail" aria-hidden="true"></i>
+                    <span>Get in touch</span>
+                </a>
+                <a class="hero-button-secondary" href="{% url 'portfolio:app_list' %}">
+                    <i data-lucide="terminal" aria-hidden="true"></i>
+                    <span>View my technical work</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

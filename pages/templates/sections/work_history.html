@@ -1,0 +1,13 @@
+<section class="section-band bg-[var(--color-soft)]">
+    <div class="section-inner">
+        <div class="max-w-3xl">
+            <p class="section-kicker">Work History</p>
+            <h2 class="section-title">Four roles that show the operating pattern.</h2>
+        </div>
+        <div class="mt-10 grid gap-5 md:grid-cols-2">
+            {% for case_study in work_history %}
+                {% include "components/case_study_card.html" with case_study=case_study %}
+            {% endfor %}
+        </div>
+    </div>
+</section>

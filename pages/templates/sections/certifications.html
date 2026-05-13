@@ -1,0 +1,22 @@
+<section class="section-band bg-[var(--color-ink)] text-white">
+    <div class="section-inner grid gap-10 lg:grid-cols-2">
+        <div>
+            <p class="section-kicker text-[var(--color-gold)]">Certifications</p>
+            <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">Compliance is part of the craft.</h2>
+            <div class="mt-6 flex flex-wrap gap-3">
+                {% for certification in certifications %}
+                    <span class="rounded border border-white/20 bg-white/8 px-3 py-2 text-sm text-white/90">{{ certification }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <p class="section-kicker text-[var(--color-gold)]">Education</p>
+            <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">Economics, management, and the floor.</h2>
+            <div class="mt-6 space-y-3">
+                {% for item in education %}
+                    <p class="rounded border border-white/20 bg-white/8 px-4 py-3 text-white/90">{{ item }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
