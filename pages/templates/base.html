@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>
+            {% block title %}Princeton Afeez{% endblock %}
+        </title>
+        <meta name="description"
+              content="{% block meta_description %}35 years operating bars, clubs and restaurants, 15+ years of multi-unit P&L ownership, and a growing Python systems portfolio.{% endblock %}">
+        <link rel="canonical" href="{{ request.build_absolute_uri }}">
+        <meta property="og:title"
+              content="{% block og_title %}Princeton Afeez{% endblock %}">
+        <meta property="og:description"
+              content="{% block og_description %}Senior hospitality operator studying Python and system architecture.{% endblock %}">
+        <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+        <meta property="og:url" content="{{ request.build_absolute_uri }}">
+        <meta property="og:image"
+              content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/headshot.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title"
+              content="{% block twitter_title %}Princeton Afeez{% endblock %}">
+        <meta name="twitter:description"
+              content="{% block twitter_description %}Senior hospitality operator studying Python and system architecture.{% endblock %}">
+        <meta name="twitter:image"
+              content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/headshot.png' %}">
+        <link rel="stylesheet" href="{% static 'css/tw-compiled.css' %}">
+        <link rel="stylesheet" href="{% static 'css/site.css' %}">
+        <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+        <script src="{% static 'vendor/lucide.min.js' %}" defer></script>
+        <script src="{% static 'js/icons-init.js' %}" defer></script>
+        {% block structured_data %}{% endblock %}
+    </head>
+    <body class="min-h-screen bg-[var(--color-page)] text-[var(--color-ink)] antialiased">
+        <a class="skip-link" href="#main">Skip to content</a>
+        {% block body %}{% endblock %}
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

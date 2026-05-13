@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Server Error | Princeton Afeez</title>
+        <link rel="stylesheet" href="{% static 'css/tw-compiled.css' %}">
+        <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    </head>
+    <body class="min-h-screen bg-[var(--color-page)] text-[var(--color-ink)]">
+        <main class="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6">
+            <p class="section-kicker">500</p>
+            <h1 class="section-title">Something failed server-side.</h1>
+            <p class="mt-5 text-base leading-8 text-[var(--color-muted)]">
+                The error has been kept quiet on the page and should be visible in application logs.
+            </p>
+        </main>
+    </body>
+</html>

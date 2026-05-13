@@ -1,0 +1,15 @@
+{% extends "layouts/default.html" %}
+{% block title %}Page Not Found | Princeton Afeez{% endblock %}
+{% block page_content %}
+    <section class="section-band bg-white">
+        <div class="section-inner max-w-3xl">
+            <p class="section-kicker">404</p>
+            <h1 class="section-title">That page is not on the floor plan.</h1>
+            <p class="mt-5 text-base leading-8 text-[var(--color-muted)]">The page may have moved, or the URL may be mistyped.</p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a class="button-primary" href="{% url 'pages:home' %}">Home</a>
+                <a class="button-secondary" href="{% url 'portfolio:app_list' %}">Apps</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
