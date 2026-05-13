@@ -1,0 +1,35 @@
+{% load nav_tags %}
+<header class="sticky top-0 z-40 border-b border-[var(--color-line)] bg-[rgba(249,248,244,0.92)] backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6"
+         aria-label="Primary">
+        <a class="flex items-center gap-3 text-sm font-semibold text-[var(--color-ink)]"
+           href="{% url 'pages:home' %}">
+            <span class="grid h-9 w-9 place-items-center rounded border border-[var(--color-ink)] bg-[var(--color-ink)] text-white">PA</span>
+            <span>Princeton Afeez</span>
+        </a>
+        <div class="hidden items-center gap-1 md:flex">
+            {% for route_name, label in NAV_ITEMS %}
+                <a class="nav-link {% active_link route_name %}"
+                   href="{% url route_name %}">{{ label }}</a>
+            {% endfor %}
+            <a class="icon-button ml-2"
+               href="{{ RESUME_URL }}"
+               aria-label="Open resume">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+            </a>
+        </div>
+        <details class="relative md:hidden">
+            <summary class="icon-button list-none" aria-label="Open navigation">
+                <i data-lucide="menu" aria-hidden="true"></i>
+            </summary>
+            <div class="absolute right-0 mt-3 w-52 rounded border border-[var(--color-line)] bg-white p-2 shadow-lg">
+                {% for route_name, label in NAV_ITEMS %}
+                    <a class="block rounded px-3 py-2 text-sm font-medium hover:bg-[var(--color-soft)]"
+                       href="{% url route_name %}">{{ label }}</a>
+                {% endfor %}
+                <a class="block rounded px-3 py-2 text-sm font-medium hover:bg-[var(--color-soft)]"
+                   href="{{ RESUME_URL }}">Resume</a>
+            </div>
+        </details>
+    </nav>
+</header>

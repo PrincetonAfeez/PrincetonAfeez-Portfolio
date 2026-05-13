@@ -1,0 +1,18 @@
+<article class="case-card">
+    <div class="flex flex-col gap-1">
+        <p class="text-xs font-semibold uppercase text-[var(--color-accent)]">{{ case_study.dates }}</p>
+        <h3 class="text-xl font-semibold text-[var(--color-ink)]">{{ case_study.venue }}</h3>
+        <p class="text-sm font-medium text-[var(--color-muted)]">{{ case_study.role }}</p>
+    </div>
+    <p class="mt-4 text-sm leading-6 text-[var(--color-ink)]">{{ case_study.scope }}</p>
+    <ul class="mt-5 space-y-3">
+        {% for outcome in case_study.outcomes %}
+            <li class="flex gap-3 text-sm leading-6 text-[var(--color-ink)]">
+                <i class="mt-1 h-4 w-4 shrink-0 text-[var(--color-accent)]"
+                   data-lucide="check"
+                   aria-hidden="true"></i>
+                <span>{{ outcome }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+</article>

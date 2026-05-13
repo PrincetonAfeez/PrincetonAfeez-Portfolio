@@ -1,0 +1,11 @@
+<footer class="border-t border-[var(--color-line)] bg-white">
+    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-[var(--color-muted)] sm:px-6 md:flex-row md:items-center md:justify-between">
+        <p>&copy; {% now "Y" %} Princeton Afeez. Version {{ SITE_VERSION }}.</p>
+        <div class="flex flex-wrap gap-4">
+            <a class="footer-link" href="mailto:{{ CONTACT_EMAIL }}">Email</a>
+            <a class="footer-link" href="{{ LINKEDIN_URL }}">LinkedIn</a>
+            <a class="footer-link" href="{{ GITHUB_URL }}">GitHub</a>
+            <a class="footer-link" href="{% url 'portfolio:app_list' %}">Apps</a>
+        </div>
+    </div>
+</footer>
