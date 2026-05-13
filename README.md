@@ -236,7 +236,7 @@ The catalogue is version-controlled in [`content/apps.yaml`](content/apps.yaml).
 
 1. Edit `content/apps.yaml` (see [Adding an app to the catalogue](#adding-an-app-to-the-catalogue))
 2. Run `python manage.py seed_apps`
-3. Commit the YAML change. The deploy pipeline re-runs `seed_apps` automatically.
+3. Commit the YAML change. Each production deploy runs **`seed_apps`** in Railway’s **pre-deploy** step (after `migrate`), as configured in `railway.toml`.
 
 Why a manifest instead of the Django admin: see ADR-0007 in [`docs/ADRS.md`](docs/ADRS.md).
 
@@ -307,15 +307,19 @@ The site is hosted on Railway with PostgreSQL as the production database. Deploy
 
 ### Railway configuration
 
-Build command (from `railway.toml`):
+Build command (from `railway.toml` — compiles assets and static files; **no database**):
 
 ```bash
 npm ci && \
 npm run build:css && \
 pip install -r requirements/prod.txt && \
-python manage.py collectstatic --noinput && \
-python manage.py migrate && \
-python manage.py seed_apps
+python manage.py collectstatic --noinput
+```
+
+Pre-deploy command (`preDeployCommand` in `railway.toml` — runs after build, with `DATABASE_URL`):
+
+```bash
+python manage.py migrate && python manage.py seed_apps
 ```
 
 Start command:
