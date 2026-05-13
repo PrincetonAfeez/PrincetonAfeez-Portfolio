@@ -4,6 +4,8 @@ import pytest
 from django.core.management import call_command
 from django.urls import reverse
 
+from portfolio.models import App
+
 
 @pytest.fixture
 def seeded_apps(db):
@@ -13,10 +15,11 @@ def seeded_apps(db):
 @pytest.mark.django_db
 def test_app_list_full_page(client, seeded_apps):
     response = client.get(reverse("portfolio:app_list"))
+    total = App.objects.count()
 
     assert response.status_code == 200
     assert b"Plate Validator" in response.content
-    assert b"App #40 of 40" in response.content
+    assert f"App #40 of {total}".encode() in response.content
     assert b'id="app-list"' in response.content
     assert b'aria-live="polite"' in response.content
 
