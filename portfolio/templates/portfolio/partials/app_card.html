@@ -1,7 +1,9 @@
 <article class="app-card">
     <div class="flex items-start justify-between gap-4">
         <div>
-            <p class="text-xs font-semibold uppercase text-[var(--color-accent)]">App #{{ app.build_order }} of 40</p>
+            <p class="text-xs font-semibold uppercase text-[var(--color-accent)]">
+                App #{{ app.build_order }} of {{ total_apps }}
+            </p>
             <h2 class="mt-2 text-xl font-semibold text-[var(--color-ink)]">
                 <a class="hover:text-[var(--color-accent)]"
                    href="{{ app.get_absolute_url }}">{{ app.name }}</a>

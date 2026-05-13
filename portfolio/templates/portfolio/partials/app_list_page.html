@@ -6,13 +6,14 @@
     </p>
 {% endfor %}
 {% if has_next %}
+    <noscript>
+        <p class="mt-4">
+            <a class="button-secondary" href="?page={{ next_page }}">Load more</a>
+        </p>
+    </noscript>
     <div hx-get="{% url 'portfolio:app_list' %}?page={{ next_page }}"
          hx-trigger="revealed"
          hx-swap="outerHTML"
          class="h-12"
-         aria-hidden="true">
-        <noscript>
-            <a class="button-secondary" href="?page={{ next_page }}">Load more</a>
-        </noscript>
-    </div>
+         aria-hidden="true"></div>
 {% endif %}

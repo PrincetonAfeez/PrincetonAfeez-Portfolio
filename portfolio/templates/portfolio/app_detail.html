@@ -13,8 +13,8 @@
   "name": "{{ app.name|escapejs }}",
   "applicationCategory": "DeveloperApplication",
   "description": "{{ app.short_description|escapejs }}",
-  "url": "{{ request.build_absolute_uri|escapejs }}",
-  "dateCreated": "{{ app.completed_date|date:'Y-m-d' }}"
+  "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path|escapejs }}"{% if app.completed_date %},
+  "dateCreated": "{{ app.completed_date|date:'Y-m-d' }}"{% endif %}
 }
     </script>
 {% endblock %}
