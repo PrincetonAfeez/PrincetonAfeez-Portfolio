@@ -1,0 +1,9 @@
+-r base.txt
+django-debug-toolbar>=4.4,<5
+pytest>=8.3
+pytest-django>=4.9
+playwright>=1.48
+pytest-cov>=6.0
+ruff>=0.8
+black>=24.10
+djlint>=1.36
