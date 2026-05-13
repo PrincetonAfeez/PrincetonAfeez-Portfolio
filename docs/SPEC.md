@@ -519,14 +519,14 @@ Templates, `STATIC_URL` / `STATIC_ROOT` / `STATICFILES_DIRS`, and the default st
 
 ### `core/settings/prod.py`
 
-`DEBUG = False`, `ALLOWED_HOSTS` from environment, PostgreSQL via `DATABASE_URL`, console-only logging with the JSON formatter (Railway captures stdout for log aggregation, no file handler needed), strict CSP, full security headers, `SECURE_SSL_REDIRECT = True`, `SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')`, HSTS, Sentry SDK initialized.
+`DEBUG = False`, `ALLOWED_HOSTS` from environment, PostgreSQL via `DATABASE_URL`, console-only logging with the JSON formatter (Railway captures stdout for log aggregation, no file handler needed), strict CSP, full security headers, `SECURE_SSL_REDIRECT = True`, `SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')`, HSTS, Sentry SDK initialized. **`SECRET_KEY`** is read from the environment: if it is missing, empty after stripping, or equal to the development default (`INSECURE_DEFAULT_SECRET_KEY` in `base.py`), **`ImproperlyConfigured`** is raised so production never boots with the insecure fallback.
 
 ### Required environment variables
 
 | Variable | Used in | Description |
 |---|---|---|
 | `DJANGO_SETTINGS_MODULE` | All | `core.settings.dev`, `core.settings.test`, or `core.settings.prod` |
-| `SECRET_KEY` | All | Django secret. 50+ random chars. |
+| `SECRET_KEY` | All | Django secret. 50+ random chars recommended. **Prod:** must be set, non-empty, and **not** the `INSECURE_DEFAULT_SECRET_KEY` dev fallback from `base.py` — otherwise `ImproperlyConfigured`. |
 | `DATABASE_URL` | Test, Prod | CI service URL in tests; provided by Railway PostgreSQL service in prod |
 | `ALLOWED_HOSTS` | Prod | Comma-separated: `princetonafeez.com,www.princetonafeez.com` |
 | `CSRF_TRUSTED_ORIGINS` | Prod | Comma-separated with scheme: `https://princetonafeez.com,https://www.princetonafeez.com` |
@@ -616,7 +616,7 @@ Page templates extend `layouts/default.html` and fill `{% block page_content %}`
 | `status_badge.html` | App status pill | `status` |
 | `case_study_card.html` | Work history card on home | `case_study` (dataclass) |
 | `chip.html` | Capability / stack / concept chip | `label`, `variant` |
-| `app_card.html` (portfolio) | App card on `/apps/` | `app` (App instance) |
+| `app_card.html` (portfolio) | App card on `/apps/` | `app` (App instance), `total_apps` (from list view context) |
 
 ### Sections (partials, included into pages)
 
@@ -684,15 +684,17 @@ The template emits 10 app cards. After the last card, an HTMX trigger element re
 
 ```html
 {% if has_next %}
+  <noscript>
+    <p class="mt-4">
+      <a href="?page={{ next_page }}" class="pagination-fallback">Load more</a>
+    </p>
+  </noscript>
   <div
     hx-get="{% url 'portfolio:app_list' %}?page={{ next_page }}"
     hx-trigger="revealed"
     hx-swap="outerHTML"
-    class="htmx-trigger">
-    <noscript>
-      <a href="?page={{ next_page }}" class="pagination-fallback">Load more</a>
-    </noscript>
-  </div>
+    class="htmx-trigger"
+    aria-hidden="true"></div>
 {% endif %}
 ```
 
@@ -925,7 +927,7 @@ Every page sets:
 
 - `<title>` — concise, page-specific, includes site name
 - `<meta name="description">` — 140–160 characters
-- `<link rel="canonical">` — full absolute URL
+- `<link rel="canonical">` — full absolute URL using the request path **without** query parameters (avoids duplicate canonicals on paginated or filtered URLs)
 - Open Graph tags: `og:title`, `og:description`, `og:type`, `og:url`, `og:image`
 - Twitter Card tags: `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`
 
@@ -934,7 +936,7 @@ Implemented via named template blocks: `{% block title %}`, `{% block meta_descr
 ### Structured data (JSON-LD)
 
 - Home page: `Person` schema (name, jobTitle, address, sameAs links to LinkedIn/GitHub).
-- App detail pages: `SoftwareApplication` schema (name, applicationCategory, description, url, dateCreated).
+- App detail pages: `SoftwareApplication` schema (name, applicationCategory, description, url; `dateCreated` only when `completed_date` is set — omitted for in-progress or planned apps without a date).
 
 ### Sitemap
 
@@ -1052,7 +1054,7 @@ jobs:
 
 ### Deployment
 
-Railway auto-deploys from `main` when CI passes. The build command runs **`npm ci`** and **`npm run build:css`** (Tailwind → `static/css/tw-compiled.css`), then `pip install`, `collectstatic`, `migrate`, and `seed_apps` — matching `railway.toml`. The start command runs `gunicorn`.
+Railway auto-deploys from `main` when CI passes. The **build** step compiles Tailwind and runs `collectstatic` only (no database). **`migrate`** and **`seed_apps`** run in Railway’s **`preDeployCommand`** before new containers start. The **start** command runs `gunicorn`. See [`railway.toml`](../railway.toml).
 
 ---
 
@@ -1071,19 +1073,27 @@ Railway auto-deploys from `main` when CI passes. The build command runs **`npm c
    - `SENTRY_DSN = <from Sentry>`
    - `ADMIN_URL_PREFIX = control-<random>`
    - `ADMIN_ALLOWED_IPS = <comma-separated IPs>` — **required** in production; startup fails if unset or empty (see §8 and `core/settings/prod.py`).
-4. Build command (same sequence as [`railway.toml`](../railway.toml) `buildCommand`; Nixpacks must have Node available for `npm`):
+4. **Build command** (from [`railway.toml`](../railway.toml) `buildCommand`; Nixpacks must have Node for `npm` — no DB access required):
+
    ```
    npm ci && npm run build:css && \
    pip install -r requirements/prod.txt && \
-   python manage.py collectstatic --noinput && \
-   python manage.py migrate && \
-   python manage.py seed_apps
+   python manage.py collectstatic --noinput
    ```
-5. Start command:
+
+5. **Pre-deploy command** (`preDeployCommand` in `railway.toml`): runs after the image is built, inside Railway’s private network with `DATABASE_URL` available:
+
+   ```
+   python manage.py migrate && python manage.py seed_apps
+   ```
+
+6. **Start command**:
+
    ```
    gunicorn core.wsgi:application --workers 2 --bind 0.0.0.0:$PORT
    ```
-6. Custom domains: add `princetonafeez.com` and `www.princetonafeez.com`. Railway provides the target hostname.
+
+7. Custom domains: add `princetonafeez.com` and `www.princetonafeez.com`. Railway provides the target hostname.
 
 ### Pre-deploy local rehearsal
 
@@ -1195,7 +1205,7 @@ apps:
 - App rows are upserted by `slug`. Existing apps have their fields updated; new apps are created.
 - App `stack` and `concepts` values reference taxonomy slugs already defined in the same file.
 - The command is idempotent — running it twice yields the same state.
-- The command runs automatically after every deploy as part of the build command (after Tailwind compilation via npm, Python install, `collectstatic`, and `migrate`).
+- The command runs automatically on each deploy via Railway’s **`preDeployCommand`** (after `migrate`, in the same shell chain as documented in [`railway.toml`](../railway.toml)).
 
 ### Why a manifest and not the Django admin
 
