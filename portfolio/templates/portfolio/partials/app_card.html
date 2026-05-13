@@ -1,0 +1,25 @@
+<article class="app-card">
+    <div class="flex items-start justify-between gap-4">
+        <div>
+            <p class="text-xs font-semibold uppercase text-[var(--color-accent)]">App #{{ app.build_order }} of 40</p>
+            <h2 class="mt-2 text-xl font-semibold text-[var(--color-ink)]">
+                <a class="hover:text-[var(--color-accent)]"
+                   href="{{ app.get_absolute_url }}">{{ app.name }}</a>
+            </h2>
+        </div>
+        {% include "components/status_badge.html" with status=app.status label=app.get_status_display %}
+    </div>
+    <p class="mt-4 text-sm leading-6 text-[var(--color-muted)]">{{ app.short_description }}</p>
+    <div class="mt-5 flex flex-wrap gap-2">
+        {% for stack in app.stack.all %}
+            {% include "components/chip.html" with label=stack.name variant="chip-neutral" %}
+        {% endfor %}
+    </div>
+    <div class="mt-6">
+        <a class="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-accent)] hover:text-[var(--color-accent-dark)]"
+           href="{{ app.get_absolute_url }}">
+            <span>View details</span>
+            <i class="h-4 w-4" data-lucide="arrow-right" aria-hidden="true"></i>
+        </a>
+    </div>
+</article>

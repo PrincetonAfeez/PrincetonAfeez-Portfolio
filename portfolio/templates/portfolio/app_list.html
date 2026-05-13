@@ -1,0 +1,33 @@
+{% extends "layouts/default.html" %}
+{% block title %}App Catalogue | Princeton Afeez{% endblock %}
+{% block meta_description %}
+    Browse Princeton Afeez's Python application catalogue, including documented CLI and systems projects with ADRs, designs, runbooks, and lessons learned.
+{% endblock %}
+{% block page_content %}
+    <section class="section-band bg-white">
+        <div class="section-inner">
+            <div class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+                <div>
+                    <p class="section-kicker">Python Portfolio</p>
+                    <h1 class="section-title">A catalogue of shipped practice.</h1>
+                </div>
+                <p class="text-base leading-8 text-[var(--color-muted)]">
+                    Forty completed applications are listed in reverse build order. Each one links to source code and five documentation sections on GitHub.
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="section-band bg-[var(--color-soft)] pt-0">
+        <div class="section-inner">
+            <div class="mb-6 flex items-center justify-between gap-4 border-b border-[var(--color-line)] pb-4">
+                <p class="text-sm font-semibold text-[var(--color-muted)]">{{ total_apps }} apps</p>
+                <a class="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-accent)] hover:text-[var(--color-accent-dark)]"
+                   href="{{ GITHUB_URL }}">
+                    <i class="h-4 w-4" data-lucide="github" aria-hidden="true"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+            <div id="app-list" class="grid gap-4" aria-live="polite">{% include "portfolio/partials/app_list_page.html" %}</div>
+        </div>
+    </section>
+{% endblock %}

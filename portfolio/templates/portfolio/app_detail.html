@@ -1,0 +1,92 @@
+{% extends "layouts/default.html" %}
+{% load doc_tags %}
+{% block title %}{{ app.name }} | Princeton Afeez{% endblock %}
+{% block meta_description %}
+    {{ app.short_description }} View source code and five documentation sections for {{ app.name }}.
+{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block structured_data %}
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "{{ app.name|escapejs }}",
+  "applicationCategory": "DeveloperApplication",
+  "description": "{{ app.short_description|escapejs }}",
+  "url": "{{ request.build_absolute_uri|escapejs }}",
+  "dateCreated": "{{ app.completed_date|date:'Y-m-d' }}"
+}
+    </script>
+{% endblock %}
+{% block page_content %}
+    <section class="section-band bg-white">
+        <div class="section-inner">
+            <a class="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-accent)] hover:text-[var(--color-accent-dark)]"
+               href="{% url 'portfolio:app_list' %}">
+                <i class="h-4 w-4" data-lucide="arrow-left" aria-hidden="true"></i>
+                <span>Back to all apps</span>
+            </a>
+            <div class="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
+                <div>
+                    <p class="section-kicker">App #{{ app.build_order }}</p>
+                    <h1 class="section-title">{{ app.name }}</h1>
+                    <p class="mt-6 text-lg leading-8 text-[var(--color-muted)]">{{ app.short_description }}</p>
+                    <div class="mt-6">
+                        {% include "components/status_badge.html" with status=app.status label=app.get_status_display %}
+                    </div>
+                </div>
+                <div class="detail-panel">
+                    <h2 class="text-lg font-semibold text-[var(--color-ink)]">Source and documentation</h2>
+                    <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                        <a class="doc-button doc-button-primary sm:col-span-2"
+                           href="{{ app.github_url }}">
+                            <i data-lucide="github" aria-hidden="true"></i>
+                            <span>View on GitHub</span>
+                        </a>
+                        <a class="doc-button" href="{% doc_url app 'ADR' %}">
+                            <i data-lucide="file-text" aria-hidden="true"></i>
+                            <span>ADR</span>
+                        </a>
+                        <a class="doc-button" href="{% doc_url app 'TDD' %}">
+                            <i data-lucide="drafting-compass" aria-hidden="true"></i>
+                            <span>TDD</span>
+                        </a>
+                        <a class="doc-button" href="{% doc_url app 'IDS' %}">
+                            <i data-lucide="plug" aria-hidden="true"></i>
+                            <span>IDS</span>
+                        </a>
+                        <a class="doc-button" href="{% doc_url app 'RUNBOOK' %}">
+                            <i data-lucide="book-open" aria-hidden="true"></i>
+                            <span>Runbook</span>
+                        </a>
+                        <a class="doc-button sm:col-span-2"
+                           href="{% doc_url app 'LESSONS_LEARNED' %}">
+                            <i data-lucide="graduation-cap" aria-hidden="true"></i>
+                            <span>Lessons Learned</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-band bg-[var(--color-soft)] pt-0">
+        <div class="section-inner grid gap-8 lg:grid-cols-2">
+            <div>
+                <p class="section-kicker">Stack</p>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    {% for stack in app.stack.all %}
+                        {% include "components/chip.html" with label=stack.name variant="chip-neutral" %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <p class="section-kicker">Concepts</p>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    {% for concept in app.concepts.all %}
+                        {% include "components/chip.html" with label=concept.name variant="chip-strong" %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
