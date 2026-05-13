@@ -84,11 +84,11 @@ A more complete description of the site's purpose, audience, and information arc
 |---|---|
 | Language | Python 3.12 |
 | Web framework | Django 5 |
-| Interactivity | HTMX (CDN) |
+| Interactivity | HTMX (self-hosted static) |
 | Database (prod) | PostgreSQL 16 |
 | Database (dev) | SQLite |
-| Styling | Tailwind CSS (Play CDN in v1, compiled in v1.1) |
-| Icons | Lucide |
+| Styling | Tailwind CSS (compiled in v1; `npm run build:css`) |
+| Icons | Lucide (self-hosted static) |
 | Application server | Gunicorn |
 | Static files | WhiteNoise |
 | Hosting | Railway |
@@ -112,6 +112,7 @@ Prerequisites:
 - Python 3.12
 - pip
 - Git
+- Node.js 20+ and npm (for the Tailwind CSS build)
 
 Clone and set up:
 
@@ -125,6 +126,9 @@ source .venv/bin/activate            # macOS / Linux
 
 pip install -r requirements/dev.txt
 
+npm ci
+npm run build:css
+
 cp .env.example .env
 # Open .env and set SECRET_KEY (any 50+ random characters for local dev)
 
@@ -137,7 +141,7 @@ python manage.py runserver
 
 The site is now running at `http://127.0.0.1:8000/`.
 
-The default settings module for local development is `core.settings.dev`. It uses SQLite, debug mode, console logging with human-readable formatting, and a relaxed CSP that allows the Django Debug Toolbar.
+The default settings module for local development is `core.settings.dev`. It uses SQLite, debug mode, console logging with human-readable formatting, and the Django Debug Toolbar. CSP is applied in production (`core.settings.prod`), not in local dev.
 
 ---
 
@@ -406,7 +410,6 @@ The ADRs cover:
 
 ### v1.1 — Hardening
 
-- Replace Tailwind Play CDN with a compiled Tailwind build; remove `'unsafe-inline'` from `style-src` in the CSP
 - Filter chips on `/apps/` — by stack, by status
 - Server-side search on `/apps/`
 
