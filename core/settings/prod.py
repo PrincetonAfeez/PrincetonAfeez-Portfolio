@@ -14,6 +14,14 @@ from .base import *  # noqa: F403
 DEBUG = False
 ALLOWED_HOSTS = env_csv("ALLOWED_HOSTS", "princetonafeez.com,www.princetonafeez.com")  # noqa: F405
 
+_secret = os.environ.get("SECRET_KEY", "").strip()
+if not _secret or _secret == INSECURE_DEFAULT_SECRET_KEY:  # noqa: F405
+    raise ImproperlyConfigured(
+        "SECRET_KEY must be set in the environment to a strong, unique value for production "
+        "(missing, empty, or the development default is not allowed)."
+    )
+SECRET_KEY = _secret
+
 if not ADMIN_ALLOWED_IPS:  # noqa: F405
     raise ImproperlyConfigured(
         "ADMIN_ALLOWED_IPS must be set in production "

@@ -35,7 +35,9 @@ def env_csv(name: str, default: str = "") -> list[str]:
 
 load_dotenv()
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-insecure-secret-key")
+# Used only when SECRET_KEY is unset (local dev). Production must reject this value; see prod.py.
+INSECURE_DEFAULT_SECRET_KEY = "dev-only-insecure-secret-key"
+SECRET_KEY = os.environ.get("SECRET_KEY", INSECURE_DEFAULT_SECRET_KEY)
 DEBUG = env_bool("DEBUG", False)
 ALLOWED_HOSTS = env_csv("ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]")
 CSRF_TRUSTED_ORIGINS = env_csv(
