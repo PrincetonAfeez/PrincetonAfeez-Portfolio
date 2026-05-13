@@ -25,15 +25,17 @@ The site is also a capstone. The architecture choices are themselves part of wha
 
 ### Decision
 
-The web layer is Django 5. Interactivity is provided by HTMX, included via CDN. There is no JavaScript framework. There is no separate frontend application. The entire request lifecycle — routing, query, render — happens in Python returning HTML.
+The web layer is Django 5. Interactivity is provided by HTMX. Styling uses Tailwind utility classes from a **compiled** CSS bundle: a small Tailwind 3 pipeline (`tailwind.config.cjs`, `static/css/tw-input.css` → `static/css/tw-compiled.css`) runs via `npm run build:css` in local development, CI, and Railway before `collectstatic`. HTMX and Lucide are **self-hosted** first-party static files under `static/vendor/` (not third-party script CDNs). There is no JavaScript framework. There is no separate frontend application. The entire request lifecycle — routing, query, render — happens in Python returning HTML.
 
 Templates use a three-level inheritance structure (`base → layout → page`) with a small library of component and section includes. Server-rendered partials handle the one dynamic interaction the site has (infinite scroll on the apps catalogue).
 
 ### Consequences
 
-**Positive.** The stack accurately represents the author's current skill set. Every part of the site is Python; an interviewer reading the code sees consistent depth. The mental model is simple: one process, one language, one templating system. Server-side rendering gives strong SEO defaults and fast first paint without bundling tooling. HTMX as a CDN script keeps the build pipeline empty — no Webpack, no Vite, no transpilation step.
+**Positive.** The stack accurately represents the author's current skill set. Every part of the site is Python; an interviewer reading the code sees consistent depth. The mental model is simple: one process, one language, one templating system. Server-side rendering gives strong SEO defaults and fast first paint. The only front-end build step is Tailwind CSS compilation — no Webpack, no Vite, no application JavaScript transpilation. Self-hosted HTMX and Lucide keep production CSP strict (`script-src` and `style-src` limited to `'self'`) without relying on `cdn.tailwindcss.com` or `unpkg.com`.
 
 **Negative.** The site does not demonstrate experience with a JavaScript framework, which many employers list. The author accepts this; the portfolio is honest about what the author actually knows, and a misrepresented React portfolio is worse than no React portfolio. HTMX has a smaller community than React; documentation and Stack Overflow answers are thinner. If HTMX ever proves limiting for a future feature, a migration to a JS framework would be a meaningful rewrite of the catalogue interactions.
+
+The Tailwind build adds Node.js as a prerequisite wherever CSS must be regenerated (local dev after template class changes, CI, and Railway). Mitigated by committing `tw-compiled.css` and running `npm ci && npm run build:css` in the deploy pipeline so production never drifts silently from templates.
 
 The "no forms" constraint that follows from this choice (contact is `mailto:` only) removes a class of features the site might otherwise have offered.
 
@@ -113,18 +115,20 @@ This is the single highest-leverage architectural decision in the project. The f
 
 ### Decision
 
+Documentation link strategy is orthogonal to how the site loads CSS and JavaScript; see ADR-0001 for compiled Tailwind and self-hosted HTMX/Lucide.
+
 The documentation is not duplicated on the portfolio site. It remains in each app's GitHub repository as the single source of truth. The app detail page renders five buttons, one per doc section, each linking directly to the relevant H2 anchor on GitHub's rendered Markdown view.
 
 Two corrections to the original convention are made as part of this decision:
 
 1. **Section headings change from H1 to H2.** H1 is reserved for the document title (one per document). Multiple H1 headings break semantic structure, confuse screen readers, and interact poorly with GitHub's table-of-contents rendering. The five section headings become `## ADR`, `## TDD`, `## IDS`, `## Runbook`, `## Lessons Learned`. A single `# <App Name> Documentation` H1 sits at the top of each file. The existing forty files will be migrated with a scripted rename ahead of v1 launch.
-2. **The site does not render or fetch the Markdown.** No GitHub API calls, no copying of files into the portfolio repository, no rendering pipeline. The buttons are plain anchor tags to URLs constructed from the app's `github_url`, a derived filename, and a known anchor.
+2. **The site does not render or fetch the Markdown.** No GitHub API calls, no copying of files into the portfolio repository, no rendering pipeline. The buttons are plain anchor tags to URLs constructed from the app's manifest-backed `docs_url` and a known anchor. If `docs_url` is ever omitted for a future app, the model can fall back to the default filename convention.
 
 ### Consequences
 
 **Positive.** Zero content duplication. The Markdown lives next to the code it describes, which is where it belongs and where it will be kept in sync. No build dependency on GitHub's API. No tokens to manage. No content-drift problem. The portfolio site stays small and fast. The five-button cluster on each detail page is visually legible as a differentiator even though all five links point into the same file.
 
-**Negative.** Visitors leave the portfolio site to read documentation, which weakens the site's session metrics and means GitHub's rendering controls the styling of the documents (the site cannot theme them). If a documentation file is renamed, moved into a `/docs/` subdirectory, or a repository is made private or deleted, the links break and the failure is silent. The H2 anchor convention depends on GitHub's anchor-generation algorithm staying stable; if GitHub ever changes how `#lessons-learned` is generated from `## Lessons Learned`, all anchor links break simultaneously.
+**Negative.** Visitors leave the portfolio site to read documentation, which weakens the site's session metrics and means GitHub's rendering controls the styling of the documents (the site cannot theme them). If a documentation file is renamed, moved into a `/docs/` subdirectory, or a repository is made private or deleted, the manifest URL must be updated or the links break and the failure is silent. The H2 anchor convention depends on GitHub's anchor-generation algorithm staying stable; if GitHub ever changes how `#lessons-learned` is generated from `## Lessons Learned`, all anchor links break simultaneously.
 
 The decision delegates a meaningful part of the user experience to GitHub. This is acceptable for a portfolio site whose audience includes technical readers who are familiar with GitHub, and is a reasonable trade for the architectural simplicity it provides.
 
