@@ -1,0 +1,762 @@
+# Canonical app catalogue manifest.
+# App metadata is version-controlled here and loaded with `python manage.py seed_apps`.
+
+stacks:
+  python:
+    name: Python
+    category: language
+  argparse:
+    name: argparse
+    category: library
+  collections:
+    name: Python collections
+    category: library
+  csv:
+    name: Python csv
+    category: library
+  datetime:
+    name: Python datetime
+    category: library
+  html:
+    name: Python html
+    category: library
+  json:
+    name: Python json
+    category: library
+  pathlib:
+    name: pathlib
+    category: library
+  re:
+    name: Python re
+    category: library
+  sqlite3:
+    name: SQLite
+    category: database
+  unicodedata:
+    name: Python unicodedata
+    category: library
+  black:
+    name: Black
+    category: tool
+  mypy:
+    name: mypy
+    category: tool
+  pytest:
+    name: pytest
+    category: tool
+
+concepts:
+  access-control:
+    name: Access Control
+    description: "Modeling permissions, entry rules, and controlled access decisions."
+  algorithm-visualization:
+    name: Algorithm Visualization
+    description: "Showing algorithm state step by step so the process can be inspected."
+  allowlist-filtering:
+    name: Allowlist Filtering
+    description: "Preserving approved values while rejecting everything outside the allowed set."
+  anagram-detection:
+    name: Anagram Detection
+    description: "Comparing normalized text to identify words or phrases with matching character composition."
+  arithmetic-operations:
+    name: Arithmetic Operations
+    description: "Handling calculator-style numeric operations with predictable command behavior."
+  asset-management:
+    name: Asset Management
+    description: "Tracking devices, property, or controlled resources through structured records."
+  audit-trail-reporting:
+    name: Audit Trail Reporting
+    description: "Returning structured findings, severity levels, statistics, warnings, and summary output."
+  authorization-rules:
+    name: Authorization Rules
+    description: "Encoding who can do what under specific operational constraints."
+  binary-search:
+    name: Binary Search
+    description: "Demonstrating ordered-search behavior through midpoint comparisons and narrowed ranges."
+  budgeting:
+    name: Budgeting
+    description: "Modeling income, expenses, allocations, and budget comparisons."
+  cli-design:
+    name: CLI Design
+    description: "Building command-line flags, help text, file inputs, output options, and exit behavior."
+  clock-display:
+    name: Clock Display
+    description: "Formatting and presenting current time in a readable terminal experience."
+  command-routing:
+    name: Command Routing
+    description: "Dispatching user commands to focused handlers with clear validation and output."
+  confidence-scoring:
+    name: Confidence Scoring
+    description: "Assigning deterministic confidence values based on structure, formatting, and context."
+  configuration-management:
+    name: Configuration Management
+    description: "Loading, validating, and applying settings for repeatable application behavior."
+  contact-extraction:
+    name: Contact Extraction
+    description: "Finding email addresses and phone numbers in messy text and converting them into structured rows."
+  content-generation:
+    name: Content Generation
+    description: "Assembling reusable inputs into structured written output."
+  csv-export:
+    name: CSV Export
+    description: "Writing structured records into consistent CSV columns for downstream use."
+  csv-processing:
+    name: CSV Processing
+    description: "Reading, validating, transforming, and writing comma-separated data."
+  csv-conversion:
+    name: CSV Conversion
+    description: "Converting CSV input into cleaner or alternate structured output formats."
+  currency-calculation:
+    name: Currency Calculation
+    description: "Converting amounts into cents, bills, coins, and payment-friendly totals."
+  custody-tracking:
+    name: Custody Tracking
+    description: "Recording ownership, possession, status changes, and accountability for tracked items."
+  daily-briefing:
+    name: Daily Briefing
+    description: "Generating a concise daily summary from structured inputs."
+  data-privacy:
+    name: Data Privacy
+    description: "Identifying sensitive data and reducing exposure in outputs."
+  data-transformation:
+    name: Data Transformation
+    description: "Reshaping input data into safer, cleaner, or more useful output."
+  date-calculation:
+    name: Date Calculation
+    description: "Computing age, elapsed time, countdowns, and other date-based values."
+  deduplication:
+    name: Deduplication
+    description: "Removing repeated records while preserving useful reporting about what changed."
+  device-inventory:
+    name: Device Inventory
+    description: "Tracking device records, attributes, status, and operational ownership."
+  duplicate-detection:
+    name: Duplicate Detection
+    description: "Finding exact or near-duplicate records across messy input data."
+  email-validation:
+    name: Email Validation
+    description: "Checking extracted email candidates for practical domain, local-part, and TLD validity."
+  event-tracking:
+    name: Event Tracking
+    description: "Recording operational events with useful structure for review and reporting."
+  file-io:
+    name: File I/O
+    description: "Reading from and writing to local files through predictable paths and encodings."
+  financial-analysis:
+    name: Financial Analysis
+    description: "Turning transactional or budget data into summary metrics and insights."
+  financial-modeling:
+    name: Financial Modeling
+    description: "Projecting financial outcomes from input assumptions and scenarios."
+  filesystem-automation:
+    name: Filesystem Automation
+    description: "Organizing, moving, and inspecting local files through scripted rules."
+  folder-organization:
+    name: Folder Organization
+    description: "Classifying files and placing them into clearer directory structures."
+  frequency-analysis:
+    name: Frequency Analysis
+    description: "Counting repeated words, tokens, or values and ranking the results."
+  game-loop:
+    name: Game Loop
+    description: "Managing repeated turns, board state, win conditions, and replayable interaction."
+  greedy-algorithm:
+    name: Greedy Algorithm
+    description: "Solving a problem step by step by repeatedly taking the best immediate option."
+  health-checks:
+    name: Health Checks
+    description: "Checking system state and returning clear status indicators."
+  html-generation:
+    name: HTML Generation
+    description: "Converting structured or markdown-like input into browser-readable HTML."
+  html-sanitization:
+    name: HTML Sanitization
+    description: "Cleaning lightly untrusted markup by removing unsafe tags, attributes, scripts, and comments."
+  input-validation:
+    name: Input Validation
+    description: "Rejecting malformed input and normalizing valid input before processing."
+  investment-projection:
+    name: Investment Projection
+    description: "Estimating future value, contribution impact, and scenario outcomes."
+  invite-workflow:
+    name: Invite Workflow
+    description: "Managing invite creation, status, lifecycle, and validation behavior."
+  lifecycle-management:
+    name: Lifecycle Management
+    description: "Tracking records through creation, update, completion, and archival states."
+  license-plate-validation:
+    name: License Plate Validation
+    description: "Checking plate-like input against format and jurisdiction rules."
+  log-parsing:
+    name: Log Parsing
+    description: "Reading log files, extracting meaningful events, and summarizing findings."
+  markdown-processing:
+    name: Markdown Processing
+    description: "Parsing markdown-like syntax and converting it into structured output."
+  measurement-systems:
+    name: Measurement Systems
+    description: "Converting between units with clear categories, formulas, and precision rules."
+  metrics-reporting:
+    name: Metrics Reporting
+    description: "Summarizing data into counts, totals, percentages, trends, and ranked output."
+  modular-architecture:
+    name: Modular Architecture
+    description: "Composing a larger system from focused, independently understandable modules."
+  nanp-phone-validation:
+    name: NANP Phone Validation
+    description: "Validating and normalizing US and Canada phone numbers using NANP structure rules."
+  password-strength:
+    name: Password Strength
+    description: "Scoring passwords against length, character diversity, and common weakness rules."
+  pattern-matching:
+    name: Pattern Matching
+    description: "Finding structured values in messy text with repeatable matching rules."
+  personal-finance:
+    name: Personal Finance
+    description: "Applying software structure to budgeting, spending, investment, and reconciliation problems."
+  personnel-management:
+    name: Personnel Management
+    description: "Tracking people, roles, status, and operational records in a structured registry."
+  pii-detection:
+    name: PII Detection
+    description: "Identifying personally identifiable information such as emails, phone numbers, and names."
+  platform-composition:
+    name: Platform Composition
+    description: "Combining multiple related tools into a coherent operating suite."
+  productivity-tracking:
+    name: Productivity Tracking
+    description: "Capturing time, activity, and work sessions for later summary."
+  reconciliation:
+    name: Reconciliation
+    description: "Matching records across sources and explaining differences."
+  registry-design:
+    name: Registry Design
+    description: "Maintaining structured collections of records with clear lookup and validation behavior."
+  regex-parsing:
+    name: Regex Parsing
+    description: "Using regular expressions to identify structured candidates in plain text."
+  reporting:
+    name: Reporting
+    description: "Presenting processed data in readable summaries for decision-making."
+  rule-based-scoring:
+    name: Rule-Based Scoring
+    description: "Assigning scores through deterministic rules rather than hidden heuristics."
+  rule-matching:
+    name: Rule Matching
+    description: "Applying configured rules to classify or route records."
+  security-validation:
+    name: Security Validation
+    description: "Checking inputs against safety requirements and known risky patterns."
+  settings-validation:
+    name: Settings Validation
+    description: "Checking configuration values before they control application behavior."
+  state-management:
+    name: State Management
+    description: "Maintaining clear application state across user actions."
+  string-sanitization:
+    name: String Sanitization
+    description: "Cleaning and normalizing messy text by removing unsafe or invisible character-level artifacts."
+  suite-integration:
+    name: Suite Integration
+    description: "Connecting related tools through a shared domain, conventions, and workflow."
+  system-monitoring:
+    name: System Monitoring
+    description: "Inspecting system conditions and surfacing operational status."
+  terminal-output:
+    name: Terminal Output
+    description: "Presenting command-line results with readable formatting and useful summaries."
+  test-driven-development:
+    name: Test-Driven Development
+    description: "Using automated tests to verify behavior, edge cases, and regressions."
+  text-analysis:
+    name: Text Analysis
+    description: "Inspecting text for counts, patterns, statistics, and structure."
+  text-normalization:
+    name: Text Normalization
+    description: "Transforming text into a consistent comparison or processing form."
+  time-formatting:
+    name: Time Formatting
+    description: "Displaying dates, durations, and clock values in useful formats."
+  time-tracking:
+    name: Time Tracking
+    description: "Recording time entries and summarizing activity over periods."
+  timer-logic:
+    name: Timer Logic
+    description: "Counting down, updating elapsed time, and handling completion behavior."
+  tokenization:
+    name: Tokenization
+    description: "Breaking text into words, tokens, or units for counting and analysis."
+  tool-suite:
+    name: Tool Suite
+    description: "Collecting focused utilities under one cohesive project."
+  transaction-categorization:
+    name: Transaction Categorization
+    description: "Classifying financial records into useful categories through rules."
+  turn-based-logic:
+    name: Turn-Based Logic
+    description: "Managing alternating user actions, legal moves, and outcome checks."
+  unicode-normalization:
+    name: Unicode Character Handling
+    description: "Detecting and transforming Unicode spaces, smart quotes, BOM markers, and zero-width characters."
+  unit-conversion:
+    name: Unit Conversion
+    description: "Converting values across related measurement systems."
+  url-validation:
+    name: URL Validation
+    description: "Checking links to block dangerous or malformed schemes."
+  validation-pipeline:
+    name: Validation Pipeline
+    description: "Running staged checks and returning structured pass/fail output."
+  vault-management:
+    name: Vault Management
+    description: "Managing secured records, controlled items, and operational custody."
+  vending-machine-simulation:
+    name: Vending Machine Simulation
+    description: "Modeling selection, payment, inventory, and change-making behavior."
+  word-counting:
+    name: Word Counting
+    description: "Counting words, tokens, lines, and related text statistics."
+  xss-mitigation:
+    name: XSS Mitigation
+    description: "Detecting and neutralizing common cross-site scripting vectors."
+
+apps:
+  - name: String Sanitizer
+    slug: string-sanitizer
+    short_description: "Cleans messy text and reports character-level artifacts with structured audit details."
+    status: completed
+    build_order: 1
+    github_url: https://github.com/PrincetonAfeez/String-Sanitizer
+    docs_url: https://github.com/PrincetonAfeez/String-Sanitizer/blob/main/string_sanitizer_docs.md
+    completed_date: 2026-04-01
+    stack: [python, re, unicodedata, pytest, black, mypy]
+    concepts: [string-sanitization, unicode-normalization, regex-parsing, audit-trail-reporting, test-driven-development]
+
+  - name: HTML Sanitizer
+    slug: html-sanitizer
+    short_description: "Cleans lightly untrusted HTML with plain-text and allowlisted safe-HTML modes."
+    status: completed
+    build_order: 2
+    github_url: https://github.com/PrincetonAfeez/HTML-Sanitizer
+    docs_url: https://github.com/PrincetonAfeez/HTML-Sanitizer/blob/main/html_sanitizer_docs.md
+    completed_date: 2026-04-02
+    stack: [python, re, html, argparse, json, pathlib, pytest]
+    concepts: [html-sanitization, xss-mitigation, allowlist-filtering, url-validation, cli-design, audit-trail-reporting]
+
+  - name: Contact Extractor
+    slug: contact-extractor
+    short_description: "Extracts emails and US/Canada phone numbers from messy text into validated CSV rows."
+    status: completed
+    build_order: 3
+    github_url: https://github.com/PrincetonAfeez/Contact-Extractor
+    docs_url: https://github.com/PrincetonAfeez/Contact-Extractor/blob/main/contact_extractor_docs.md
+    completed_date: 2026-04-03
+    stack: [python, re, csv, argparse, pathlib, pytest]
+    concepts: [contact-extraction, regex-parsing, email-validation, nanp-phone-validation, confidence-scoring, csv-export, deduplication, cli-design]
+
+  - name: CSV Converter
+    slug: csv-converter
+    short_description: "Converts CSV data into cleaner structured output with validation and reporting."
+    status: completed
+    build_order: 4
+    github_url: https://github.com/PrincetonAfeez/CSV-Converter
+    docs_url: https://github.com/PrincetonAfeez/CSV-Converter/blob/main/csv_converter_docs.md
+    completed_date: 2026-04-04
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [csv-conversion, csv-processing, data-transformation, file-io, cli-design]
+
+  - name: Log Parser
+    slug: log-parser
+    short_description: "Parses log files, extracts meaningful events, and summarizes operational patterns."
+    status: completed
+    build_order: 5
+    github_url: https://github.com/PrincetonAfeez/Log-Parser
+    docs_url: https://github.com/PrincetonAfeez/Log-Parser/blob/main/log_parser_docs.md
+    completed_date: 2026-04-05
+    stack: [python, re, argparse, pathlib, pytest]
+    concepts: [log-parsing, pattern-matching, reporting, file-io, cli-design]
+
+  - name: Password Checker
+    slug: password-checker
+    short_description: "Evaluates password strength with deterministic rules and clear security feedback."
+    status: completed
+    build_order: 6
+    github_url: https://github.com/PrincetonAfeez/Password-Checker
+    docs_url: https://github.com/PrincetonAfeez/Password-Checker/blob/main/password_checker_docs.md
+    completed_date: 2026-04-06
+    stack: [python, re, argparse, pytest]
+    concepts: [password-strength, security-validation, rule-based-scoring, input-validation, cli-design]
+
+  - name: Dataguard
+    slug: dataguard
+    short_description: "Bundles data-cleaning and privacy utilities into a small command-line toolkit."
+    status: completed
+    build_order: 7
+    github_url: https://github.com/PrincetonAfeez/Dataguard
+    docs_url: https://github.com/PrincetonAfeez/Dataguard/blob/main/dataguard_docs.md
+    completed_date: 2026-04-07
+    stack: [python, argparse, json, pathlib, pytest]
+    concepts: [data-privacy, pii-detection, validation-pipeline, modular-architecture, tool-suite, cli-design]
+
+  - name: Budget
+    slug: budget
+    short_description: "Models budget categories and spending inputs to produce personal finance summaries."
+    status: completed
+    build_order: 8
+    github_url: https://github.com/PrincetonAfeez/Budget
+    docs_url: https://github.com/PrincetonAfeez/Budget/blob/main/budget_docs.md
+    completed_date: 2026-04-08
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [budgeting, personal-finance, csv-processing, financial-analysis, reporting, cli-design]
+
+  - name: Change Maker
+    slug: change-maker
+    short_description: "Calculates coin and bill combinations using a clear greedy change-making workflow."
+    status: completed
+    build_order: 9
+    github_url: https://github.com/PrincetonAfeez/Change-Maker
+    docs_url: https://github.com/PrincetonAfeez/Change-Maker/blob/main/change_maker_docs.md
+    completed_date: 2026-04-09
+    stack: [python, argparse, pytest]
+    concepts: [greedy-algorithm, currency-calculation, arithmetic-operations, input-validation, cli-design]
+
+  - name: Investment
+    slug: investment
+    short_description: "Projects investment scenarios from contributions, returns, and time horizons."
+    status: completed
+    build_order: 10
+    github_url: https://github.com/PrincetonAfeez/Investment
+    docs_url: https://github.com/PrincetonAfeez/Investment/blob/main/investment_docs.md
+    completed_date: 2026-04-10
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [investment-projection, financial-modeling, personal-finance, reporting, cli-design]
+
+  - name: Categorizer
+    slug: categorizer
+    short_description: "Classifies transaction rows into categories with repeatable matching rules."
+    status: completed
+    build_order: 11
+    github_url: https://github.com/PrincetonAfeez/Categorizer
+    docs_url: https://github.com/PrincetonAfeez/Categorizer/blob/main/categorizer_docs.md
+    completed_date: 2026-04-11
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [transaction-categorization, rule-matching, csv-processing, personal-finance, cli-design]
+
+  - name: Reconciler
+    slug: reconciler
+    short_description: "Matches financial records across sources and reports duplicates or differences."
+    status: completed
+    build_order: 12
+    github_url: https://github.com/PrincetonAfeez/Reconciler
+    docs_url: https://github.com/PrincetonAfeez/Reconciler/blob/main/reconciler_docs.md
+    completed_date: 2026-04-12
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [reconciliation, duplicate-detection, csv-processing, financial-analysis, reporting, cli-design]
+
+  - name: Analyzer
+    slug: analyzer
+    short_description: "Analyzes financial records to surface trends, summaries, and useful metrics."
+    status: completed
+    build_order: 13
+    github_url: https://github.com/PrincetonAfeez/Analyzer
+    docs_url: https://github.com/PrincetonAfeez/Analyzer/blob/main/analyzer_docs.md
+    completed_date: 2026-04-13
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [financial-analysis, metrics-reporting, csv-processing, personal-finance, reporting, cli-design]
+
+  - name: Ledger Logic
+    slug: ledger-logic
+    short_description: "Unifies budgeting, categorization, reconciliation, analysis, and projections into one finance suite."
+    status: completed
+    build_order: 14
+    github_url: https://github.com/PrincetonAfeez/Ledger-Logic
+    docs_url: https://github.com/PrincetonAfeez/Ledger-Logic/blob/main/ledger_logic_docs.md
+    completed_date: 2026-04-14
+    stack: [python, csv, argparse, pathlib, pytest]
+    concepts: [suite-integration, personal-finance, modular-architecture, financial-analysis, tool-suite, cli-design]
+
+  - name: Devices
+    slug: devices
+    short_description: "Tracks device inventory records, statuses, and operational metadata."
+    status: completed
+    build_order: 15
+    github_url: https://github.com/PrincetonAfeez/Devices
+    docs_url: https://github.com/PrincetonAfeez/Devices/blob/main/devices_docs.md
+    completed_date: 2026-04-15
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [device-inventory, asset-management, state-management, reporting, cli-design]
+
+  - name: Access
+    slug: access
+    short_description: "Models access decisions and authorization rules for controlled operational areas."
+    status: completed
+    build_order: 16
+    github_url: https://github.com/PrincetonAfeez/Access
+    docs_url: https://github.com/PrincetonAfeez/Access/blob/main/access_docs.md
+    completed_date: 2026-04-16
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [access-control, authorization-rules, security-validation, state-management, cli-design]
+
+  - name: Vault
+    slug: vault
+    short_description: "Manages secured items, custody records, and reconciliation-style vault summaries."
+    status: completed
+    build_order: 17
+    github_url: https://github.com/PrincetonAfeez/Vault
+    docs_url: https://github.com/PrincetonAfeez/Vault/blob/main/vault_docs.md
+    completed_date: 2026-04-17
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [vault-management, custody-tracking, asset-management, reconciliation, cli-design]
+
+  - name: Personnel
+    slug: personnel
+    short_description: "Maintains personnel records for employees, contractors, and visitors."
+    status: completed
+    build_order: 18
+    github_url: https://github.com/PrincetonAfeez/Personnel
+    docs_url: https://github.com/PrincetonAfeez/Personnel/blob/main/personnel_docs.md
+    completed_date: 2026-04-18
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [personnel-management, registry-design, validation-pipeline, state-management, cli-design]
+
+  - name: Events
+    slug: events
+    short_description: "Records operational events and produces structured summaries for review."
+    status: completed
+    build_order: 19
+    github_url: https://github.com/PrincetonAfeez/Events
+    docs_url: https://github.com/PrincetonAfeez/Events/blob/main/events_docs.md
+    completed_date: 2026-04-19
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [event-tracking, audit-trail-reporting, lifecycle-management, reporting, cli-design]
+
+  - name: Invites
+    slug: invites
+    short_description: "Manages invite records, lifecycle states, and validation rules."
+    status: completed
+    build_order: 20
+    github_url: https://github.com/PrincetonAfeez/Invites
+    docs_url: https://github.com/PrincetonAfeez/Invites/blob/main/invites_docs.md
+    completed_date: 2026-04-20
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [invite-workflow, lifecycle-management, access-control, validation-pipeline, cli-design]
+
+  - name: Vault OS
+    slug: vault-os
+    short_description: "Composes access, devices, events, invites, personnel, and vault tools into one operations suite."
+    status: completed
+    build_order: 21
+    github_url: https://github.com/PrincetonAfeez/Vault-OS-Facility
+    docs_url: https://github.com/PrincetonAfeez/Vault-OS-Facility/blob/main/vault_os_facility_docs.md
+    completed_date: 2026-04-21
+    stack: [python, json, argparse, pathlib, pytest]
+    concepts: [platform-composition, modular-architecture, suite-integration, vault-management, tool-suite, cli-design]
+
+  - name: Daily Briefing Generator
+    slug: daily-briefing-generator
+    short_description: "Generates concise daily briefings from structured operational inputs."
+    status: completed
+    build_order: 22
+    github_url: https://github.com/PrincetonAfeez/SysForge/tree/main/sysforge/briefing
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/briefing/briefing_docs.md
+    completed_date: 2026-04-22
+    stack: [python, argparse, datetime, pathlib, pytest]
+    concepts: [daily-briefing, content-generation, reporting, cli-design]
+
+  - name: Configuration Manager
+    slug: configuration-manager
+    short_description: "Loads, validates, and reports configuration values for repeatable tool behavior."
+    status: completed
+    build_order: 23
+    github_url: https://github.com/PrincetonAfeez/SysForge/tree/main/sysforge/config
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/config/config_docs.md
+    completed_date: 2026-04-23
+    stack: [python, argparse, json, pathlib, pytest]
+    concepts: [configuration-management, settings-validation, validation-pipeline, cli-design]
+
+  - name: Markdown-to-HTML Generator
+    slug: markdown-to-html-generator
+    short_description: "Converts markdown-like input into structured HTML output."
+    status: completed
+    build_order: 24
+    github_url: https://github.com/PrincetonAfeez/SysForge/tree/main/sysforge/mdhtml
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/mdhtml/mdhtml_docs.md
+    completed_date: 2026-04-24
+    stack: [python, argparse, html, pathlib, pytest]
+    concepts: [markdown-processing, html-generation, file-io, cli-design]
+
+  - name: System Health Monitor
+    slug: system-health-monitor
+    short_description: "Checks system conditions and reports operational health status."
+    status: completed
+    build_order: 25
+    github_url: https://github.com/PrincetonAfeez/SysForge/tree/main/sysforge/monitor
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/monitor/monitor_docs.md
+    completed_date: 2026-04-25
+    stack: [python, argparse, datetime, pathlib, pytest]
+    concepts: [system-monitoring, health-checks, metrics-reporting, reporting, cli-design]
+
+  - name: Folder Organizer
+    slug: folder-organizer
+    short_description: "Organizes files into clearer folders using extension and path rules."
+    status: completed
+    build_order: 26
+    github_url: https://github.com/PrincetonAfeez/SysForge/tree/main/sysforge/organizer
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/organizer/organizer_docs.md
+    completed_date: 2026-04-26
+    stack: [python, argparse, pathlib, pytest]
+    concepts: [folder-organization, filesystem-automation, file-io, cli-design]
+
+  - name: Time Tracker
+    slug: time-tracker
+    short_description: "Tracks work sessions and summarizes time entries from command-line input."
+    status: completed
+    build_order: 27
+    github_url: https://github.com/PrincetonAfeez/SysForge/tree/main/sysforge/timetracker
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/timetracker/timetracker_docs.md
+    completed_date: 2026-04-27
+    stack: [python, argparse, csv, datetime, pathlib, pytest]
+    concepts: [time-tracking, productivity-tracking, csv-processing, reporting, cli-design]
+
+  - name: SysForge
+    slug: sysforge
+    short_description: "Collects briefing, configuration, markdown, monitoring, organizing, and time tools into one suite."
+    status: completed
+    build_order: 28
+    github_url: https://github.com/PrincetonAfeez/SysForge
+    docs_url: https://github.com/PrincetonAfeez/SysForge/blob/main/sysforge/sysforge_docs.md
+    completed_date: 2026-04-28
+    stack: [python, argparse, json, pathlib, pytest]
+    concepts: [tool-suite, modular-architecture, suite-integration, platform-composition, cli-design]
+
+  - name: Age Calculator
+    slug: age-calculator
+    short_description: "Calculates age and date differences from birth dates and reference dates."
+    status: completed
+    build_order: 29
+    github_url: https://github.com/PrincetonAfeez/Age-Calculator
+    docs_url: https://github.com/PrincetonAfeez/Age-Calculator/blob/main/age_calculator_docs.md
+    completed_date: 2026-04-29
+    stack: [python, argparse, datetime, pytest]
+    concepts: [date-calculation, input-validation, cli-design]
+
+  - name: Anagram Detector
+    slug: anagram-detector
+    short_description: "Detects anagrams by normalizing text and comparing character counts."
+    status: completed
+    build_order: 30
+    github_url: https://github.com/PrincetonAfeez/Anagram-Detector
+    docs_url: https://github.com/PrincetonAfeez/Anagram-Detector/blob/main/anagram_detector_docs.md
+    completed_date: 2026-04-20
+    stack: [python, argparse, collections, pytest]
+    concepts: [anagram-detection, text-normalization, input-validation, cli-design]
+
+  - name: Binary Search Visualizer
+    slug: binary-search-visualizer
+    short_description: "Shows binary search progress through ordered lists with step-by-step output."
+    status: completed
+    build_order: 31
+    github_url: https://github.com/PrincetonAfeez/Binary-Search-Visualizer
+    docs_url: https://github.com/PrincetonAfeez/Binary-Search-Visualizer/blob/main/binary_search_visualizer_docs.md
+    completed_date: 2026-04-21
+    stack: [python, argparse, pytest]
+    concepts: [binary-search, algorithm-visualization, terminal-output, cli-design]
+
+  - name: Calculator
+    slug: calculator
+    short_description: "Runs basic arithmetic operations through a small command-line calculator."
+    status: completed
+    build_order: 32
+    github_url: https://github.com/PrincetonAfeez/Calculator_v2
+    docs_url: https://github.com/PrincetonAfeez/Calculator_v2/blob/main/calculator_docs.md
+    completed_date: 2026-04-22
+    stack: [python, argparse, pytest]
+    concepts: [arithmetic-operations, command-routing, input-validation, cli-design]
+
+  - name: Countdown Timer
+    slug: countdown-timer
+    short_description: "Runs countdown timers with formatted terminal output and completion behavior."
+    status: completed
+    build_order: 33
+    github_url: https://github.com/PrincetonAfeez/Countdown-Timer
+    docs_url: https://github.com/PrincetonAfeez/Countdown-Timer/blob/main/countdown_timer_docs.md
+    completed_date: 2026-04-23
+    stack: [python, argparse, datetime, pytest]
+    concepts: [timer-logic, terminal-output, time-formatting, cli-design]
+
+  - name: Digital Clock
+    slug: digital-clock
+    short_description: "Displays current time in a terminal-friendly digital clock format."
+    status: completed
+    build_order: 34
+    github_url: https://github.com/PrincetonAfeez/Digital-Clock
+    docs_url: https://github.com/PrincetonAfeez/Digital-Clock/blob/main/digital_clock_docs.md
+    completed_date: 2026-04-24
+    stack: [python, argparse, datetime, pytest]
+    concepts: [clock-display, time-formatting, terminal-output, cli-design]
+
+  - name: Frequency Counter
+    slug: frequency-counter
+    short_description: "Counts token frequencies in text and reports ranked frequency summaries."
+    status: completed
+    build_order: 35
+    github_url: https://github.com/PrincetonAfeez/Frequency-Counter
+    docs_url: https://github.com/PrincetonAfeez/Frequency-Counter/blob/main/frequency_counter_docs.md
+    completed_date: 2026-04-25
+    stack: [python, argparse, collections, pathlib, pytest]
+    concepts: [frequency-analysis, tokenization, text-analysis, reporting, cli-design]
+
+  - name: Tic Tac Toe
+    slug: tic-tac-toe
+    short_description: "Implements a playable terminal Tic Tac Toe game with turn and win-state logic."
+    status: completed
+    build_order: 36
+    github_url: https://github.com/PrincetonAfeez/Tic-Tac-Toe
+    docs_url: https://github.com/PrincetonAfeez/Tic-Tac-Toe/blob/main/tic_tac_toe_docs.md
+    completed_date: 2026-04-26
+    stack: [python, argparse, pytest]
+    concepts: [game-loop, turn-based-logic, state-management, input-validation, cli-design]
+
+  - name: Unit Converter
+    slug: unit-converter
+    short_description: "Converts values across common measurement systems with clear input validation."
+    status: completed
+    build_order: 37
+    github_url: https://github.com/PrincetonAfeez/Unit-Converter
+    docs_url: https://github.com/PrincetonAfeez/Unit-Converter/blob/main/unit_converter_docs.md
+    completed_date: 2026-04-27
+    stack: [python, argparse, pytest]
+    concepts: [unit-conversion, measurement-systems, arithmetic-operations, input-validation, cli-design]
+
+  - name: Virtual Vending Machine
+    slug: virtual-vending-machine
+    short_description: "Simulates vending selections, payment, inventory state, and change-making."
+    status: completed
+    build_order: 38
+    github_url: https://github.com/PrincetonAfeez/Virtual-Vending-Machine
+    docs_url: https://github.com/PrincetonAfeez/Virtual-Vending-Machine/blob/main/virtual_vending_machine_docs.md
+    completed_date: 2026-04-28
+    stack: [python, argparse, pytest]
+    concepts: [vending-machine-simulation, state-management, greedy-algorithm, input-validation, cli-design]
+
+  - name: Word Counter
+    slug: word-counter
+    short_description: "Counts words and text statistics from files or direct terminal input."
+    status: completed
+    build_order: 39
+    github_url: https://github.com/PrincetonAfeez/Word-Counter
+    docs_url: https://github.com/PrincetonAfeez/Word-Counter/blob/main/word_counter_docs.md
+    completed_date: 2026-04-29
+    stack: [python, argparse, collections, pathlib, pytest]
+    concepts: [word-counting, tokenization, text-analysis, file-io, cli-design]
+
+  - name: Plate Validator
+    slug: plate-validator
+    short_description: "Validates license-plate-like input against deterministic formatting rules."
+    status: completed
+    build_order: 40
+    github_url: https://github.com/PrincetonAfeez/Plate-Validator_v1
+    docs_url: https://github.com/PrincetonAfeez/Plate-Validator_v1/blob/main/plate_validator_docs.md
+    completed_date: 2026-04-20
+    stack: [python, argparse, re, pytest]
+    concepts: [license-plate-validation, regex-parsing, input-validation, cli-design]
