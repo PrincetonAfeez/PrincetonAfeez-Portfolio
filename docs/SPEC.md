@@ -1,11 +1,11 @@
-﻿# Princeton Afeez Portfolio — Project Specification
+# Princeton Afeez Portfolio — Project Specification
 
 **Project:** Personal portfolio capstone documenting Python and system architecture work, anchored by a 35-year hospitality career.
 **Domain:** princetonafeez.com (registered at GoDaddy, hosted on Railway)
-**Stack:** Python 3.12 · Django 5 · HTMX · PostgreSQL 16 · Tailwind CSS
+**Stack:** Python 3.12 · Django 5 · HTMX · PostgreSQL 16 · Tailwind CSS (compiled)
 **Status:** v1 specification — locked
 **Author:** Princeton Afeez
-**Last updated:** May 2026
+**Last updated:** May 12, 2026
 
 ---
 
@@ -26,7 +26,7 @@ The site is itself a capstone project. It is the first Django + HTMX application
 - All 40 existing apps catalogued with consistent metadata and deep-linked documentation.
 - A hospitality decision-maker can land on the home page, understand Princeton's operator credentials in under 30 seconds, and find a way to contact him in one click.
 - A technical reader can land on `/apps/`, browse the chronological catalogue, and open any app's five-section documentation in two clicks.
-- 70% test coverage with all critical paths exercised.
+- 70% test coverage floor with all critical paths exercised; actual coverage at v1 launch is 87.9%.
 - CI green on every push to `main`. Deploys auto-trigger on merge.
 
 ---
@@ -195,14 +195,14 @@ Bachelor of Arts in Economics and Business Management
 
 ### Assets
 
-- **Headshot:** sourced from `http://www.princetonafeez.com/images/glint_about_1.jpg` (existing asset on the legacy site). Copied into the new project's `static/` directory at build time.
+- **Headshot:** committed in the repository at `static/img/headshot.png` (no runtime dependency on the legacy site).
 - **Resume:** PDF, served at `/resume.pdf`.
 
 ---
 
 ## 5. Data Model
 
-The data model is intentionally small. Four models, two many-to-many relationships, no overengineering.
+The data model is intentionally small. Three models, two many-to-many relationships, no overengineering.
 
 ```python
 # portfolio/models.py
@@ -260,6 +260,7 @@ class App(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     build_order = models.PositiveIntegerField(unique=True, db_index=True)
     github_url = models.URLField()
+    docs_url = models.URLField(blank=True)
     hero_image = models.ImageField(upload_to='apps/', blank=True, null=True)
     completed_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -302,12 +303,14 @@ class App(models.Model):
             → 'https://github.com/PrincetonAfeez/String-Sanitizer/blob/main/string_sanitizer_docs.md#adr'
         """
         anchor = self.DOC_ANCHORS[doc_type]
-        return f"{self.github_url}/blob/main/{self.docs_filename}#{anchor}"
+        docs_url = self.docs_url or f"{self.github_url}/blob/main/{self.docs_filename}"
+        return f"{docs_url}#{anchor}"
 ```
 
 ### Notes on the data model
 
 - **The five docs are not stored in the database.** They live in each app's GitHub repository as one Markdown file per app (e.g., `string_sanitizer_docs.md`). The five sections within that file are H2 headings, and the site deep-links to each H2's auto-generated GitHub anchor. See ADR-0003.
+- **`github_url` is the visible source link.** `docs_url` is the exact Markdown documentation file URL used for the five documentation buttons. If `docs_url` is blank, the site falls back to the default filename convention under `github_url`.
 - **`build_order` is the canonical sort field**, not `completed_date`. This shows progression in the order Princeton actually built the apps, even if he completes them out of order.
 - **M2M for `stack` and `concept`** rather than free-text fields. Filtering is out of scope for v1, but the data model supports it without migration. See ADR-0004.
 - **Indexes:** `slug` (unique, default index), `build_order` (unique, explicit index for ordering performance).
@@ -321,18 +324,20 @@ class App(models.Model):
 |---|---|---|
 | Language | Python 3.12 | Current stable, type-hint maturity, matches Princeton's learning track |
 | Web framework | Django 5 | Batteries included, mature ORM, admin, security baseline |
-| Interactivity | HTMX | Server-rendered enhancement, no JS framework, matches "pure templates" discipline |
+| Interactivity | HTMX (self-hosted UMD under `static/vendor/`) | Server-rendered enhancement, no JS framework, no third-party script origin in CSP |
 | Database (prod) | PostgreSQL 16 | Production standard, hosted by Railway |
 | Database (dev) | SQLite | Fast local iteration, no setup overhead |
-| Styling | Tailwind CSS via Play CDN (v1) → compiled (v1.1) | Ship fast in v1, harden in v1.1 |
-| Icons | Lucide (CDN) | Open-source, comprehensive, low overhead |
+| Styling | Tailwind CSS compiled in v1 (`npm run build:css`, Tailwind 3 JIT) | Strong CSP (`style-src 'self'`), only utilities referenced in templates |
+| Icons | Lucide (self-hosted UMD under `static/vendor/`) | Open-source, comprehensive; no third-party script origin in CSP |
 | Markdown rendering | Not applicable in v1 | Docs are deep-linked to GitHub, not rendered on-site |
-| Static files | WhiteNoise | Standard for Django on Railway, no separate CDN needed for v1 |
+| Static files | WhiteNoise with `CompressedManifestStaticFilesStorage` (prod) | Cache-busting filenames and compression; no separate CDN needed for v1 |
 | Application server | Gunicorn | Standard, well-understood, two workers sufficient for v1 traffic |
-| Error monitoring | Sentry (free tier) | Capture unhandled exceptions and 500s in prod |
+| Error monitoring | Sentry (free tier, 10% trace sampling, PII off) | Capture unhandled exceptions and 500s in prod |
 | Logging | `python-json-logger` (prod) + standard logging (dev) | JSON for log aggregation, human-readable for local |
+| Content Security Policy | `django-csp` 4.x (dict-based `CONTENT_SECURITY_POLICY`) | Locked to `'self'`; no inline scripts or third-party CDNs |
 | Test runner | pytest + pytest-django | More expressive than unittest, ecosystem better |
-| Coverage | `coverage.py` | Integrated with pytest, enforced in CI |
+| Coverage | `coverage.py` (87.9% at v1 launch, 70% CI floor) | Enforced in CI; uncovered branches are deliberate exclusions |
+| Accessibility smoke | Playwright + axe-core | Browser-based a11y checks under `e2e/` |
 | Linting | `ruff` | Fast, single tool replaces multiple |
 | Formatting | `black` | Standard, opinionated, no debate |
 | Template linting | `djlint` | Catches template issues that `ruff` and `black` won't see |
@@ -355,17 +360,18 @@ princetonafeez/
 ├── SECURITY.md
 ├── CONTRIBUTING.md
 ├── docs/
+│   ├── README.md
 │   ├── SPEC.md                              # This document
-│   └── adr/
-│       ├── 0001-django-htmx-monolith.md
-│       ├── 0002-postgres-on-railway.md
-│       ├── 0003-five-docs-via-github-deep-links.md
-│       ├── 0004-m2m-stack-and-concept.md
-│       ├── 0005-htmx-infinite-scroll.md
-│       ├── 0006-logging-strategy.md
-│       └── 0007-content-sync-via-manifest.md
+│   ├── ADRS.md                              # All seven ADRs in one compendium
+│   └── notes/                               # Working notes (not part of the published spec)
+│       ├── content.txt
+│       ├── project-tree.txt
+│       └── technical docs.txt
 ├── manage.py
 ├── pyproject.toml
+├── package.json                             # Tailwind build scripts (`npm run build:css`)
+├── package-lock.json
+├── tailwind.config.cjs
 ├── requirements/
 │   ├── base.txt
 │   ├── dev.txt
@@ -373,6 +379,7 @@ princetonafeez/
 ├── VERSION
 ├── railway.toml
 ├── content/
+│   ├── README.md
 │   └── apps.yaml                            # Manifest: all 90 apps, version-controlled
 ├── core/
 │   ├── __init__.py
@@ -381,12 +388,40 @@ princetonafeez/
 │   ├── urls.py
 │   ├── context_processors.py
 │   ├── logging_config.py
-│   └── settings/
+│   ├── middleware.py                        # AdminIPAllowlistMiddleware (prod admin IP gate)
+│   ├── sitemaps.py                          # Sitemap classes for django.contrib.sitemaps
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── dev.py
+│   │   ├── test.py
+│   │   └── prod.py
+│   └── tests/
 │       ├── __init__.py
-│       ├── base.py
-│       ├── dev.py
-│       ├── test.py
-│       └── prod.py
+│       ├── test_context_processors.py
+│       ├── test_middleware.py
+│       └── test_prod_settings.py
+├── e2e/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── axe_helpers.py
+│   └── test_smoke_a11y.py                   # Playwright + axe smoke accessibility checks
+├── static/
+│   ├── css/
+│   │   ├── tw-input.css                     # Tailwind source (JIT entry)
+│   │   ├── tw-compiled.css                  # Built bundle (committed; CI/deploy rebuilds)
+│   │   └── site.css                         # Project overrides and tokens
+│   ├── js/
+│   │   └── icons-init.js                    # Lucide `createIcons()` after load
+│   ├── img/
+│   │   ├── README.md
+│   │   └── headshot.png
+│   ├── vendor/
+│   │   ├── htmx.min.js
+│   │   └── lucide.min.js
+│   └── resume/
+│       ├── README.md
+│       └── resume.pdf                       # Served at /resume.pdf (see URL routing)
 ├── pages/
 │   ├── __init__.py
 │   ├── apps.py
@@ -413,7 +448,6 @@ princetonafeez/
 │       ├── components/
 │       │   ├── navbar.html
 │       │   ├── footer.html
-│       │   ├── cta_button.html
 │       │   ├── status_badge.html
 │       │   ├── case_study_card.html
 │       │   └── chip.html
@@ -444,7 +478,7 @@ princetonafeez/
     │   ├── test_models.py
     │   ├── test_views.py
     │   ├── test_urls.py
-    │   ├── test_doc_urls.py
+    │   ├── test_template_tags.py
     │   └── test_seed_apps.py
     └── templates/
         └── portfolio/
@@ -455,7 +489,7 @@ princetonafeez/
                 └── app_list_page.html
 ```
 
-Two Django apps: `pages` (the static marketing surface — home, about, contact, error pages, components) and `portfolio` (the dynamic catalogue — App model, list view, detail view, seed command). Clean separation of concerns. Each app has its own tests directory.
+Two Django apps: `pages` (the static marketing surface — home, about, contact, error pages, components) and `portfolio` (the dynamic catalogue — App model, list view, detail view, seed command). Clean separation of concerns. Each app has its own tests directory. The `core` package adds URL routing, context processors, logging configuration, `AdminIPAllowlistMiddleware` and sitemap classes (`middleware.py`, `sitemaps.py`), settings split, and `core/tests/` for those concerns. First-party static assets and the Tailwind build artifacts live under `static/`; Node dependencies and `npm run build:css` are declared in `package.json` / `package-lock.json`. Optional Playwright + axe smoke checks live under `e2e/`.
 
 ---
 
@@ -469,11 +503,19 @@ Shared defaults: `INSTALLED_APPS`, `MIDDLEWARE`, `TEMPLATES` (with the site cont
 
 ### `core/settings/dev.py`
 
-`DEBUG = True`, `ALLOWED_HOSTS = ['*']`, SQLite database, console-only logging with the human-readable formatter, relaxed CSP (allows Django Debug Toolbar), Django Debug Toolbar enabled, no SSL redirects.
+`DEBUG = True`, `ALLOWED_HOSTS = ['*']`, SQLite database, console-only logging with the human-readable formatter, Django Debug Toolbar enabled, no SSL redirects. Content Security Policy is enforced in production only (`django-csp` in `prod.py`); local dev does not load the CSP middleware, which keeps the Django Debug Toolbar usable without CSP exceptions.
 
 ### `core/settings/test.py`
 
-`DEBUG = False`, PostgreSQL via `DATABASE_URL`, no Django Debug Toolbar, fast password hashers, local-memory email backend, and the same template/static settings as production where practical. CI uses this module so tests exercise PostgreSQL behavior without changing the local development workflow.
+Imports everything from `core/settings/base.py` and applies a small set of overrides — nothing from `prod.py` is merged in.
+
+- **`DEBUG = False`** — matches production's debug flag without enabling prod-only middleware or storage.
+- **`PASSWORD_HASHERS`** — `MD5PasswordHasher` only, for faster tests (this module must not be used for `runserver` or production; see the module docstring).
+- **`EMAIL_BACKEND`** — `django.core.mail.backends.locmem.EmailBackend` so tests never send real mail.
+- **`DATABASES`** — if `DATABASE_URL` is set, the default database is replaced with PostgreSQL via `dj_database_url` (`conn_max_age=0`). If it is unset, the configuration **keeps SQLite from `base.py`**. CI sets `DATABASE_URL` so the pipeline exercises PostgreSQL; a developer can run pytest locally without Postgres and still use SQLite.
+- **`LOGGING`** — `build_logging_config(is_prod=False)`, i.e. the same **development-style** (human-readable console) logging as `base.py` / `dev.py`, not the JSON production formatter.
+
+Templates, `STATIC_URL` / `STATIC_ROOT` / `STATICFILES_DIRS`, and the default staticfiles backend therefore stay exactly as in **`base.py`**. Test settings do **not** enable production-only `STORAGES` (`CompressedManifestStaticFilesStorage`), `django-csp`, or other `prod.py` security and static-asset behavior — those exist only under `core.settings.prod`.
 
 ### `core/settings/prod.py`
 
@@ -487,12 +529,13 @@ Shared defaults: `INSTALLED_APPS`, `MIDDLEWARE`, `TEMPLATES` (with the site cont
 | `SECRET_KEY` | All | Django secret. 50+ random chars. |
 | `DATABASE_URL` | Test, Prod | CI service URL in tests; provided by Railway PostgreSQL service in prod |
 | `ALLOWED_HOSTS` | Prod | Comma-separated: `princetonafeez.com,www.princetonafeez.com` |
+| `CSRF_TRUSTED_ORIGINS` | Prod | Comma-separated with scheme: `https://princetonafeez.com,https://www.princetonafeez.com` |
 | `ADMIN_URL_PREFIX` | Prod | Randomized admin path segment, e.g. `control-9aB4xQ` |
-| `ADMIN_ALLOWED_IPS` | Prod | Comma-separated IP allowlist for admin access |
+| `ADMIN_ALLOWED_IPS` | Prod | **Required** in production: comma-separated IPs allowed to reach Django admin (empty or unset raises `ImproperlyConfigured`). |
 | `SENTRY_DSN` | Prod | Sentry project DSN |
 | `DEBUG` | All | `True` or `False` |
 
-A `.env.example` ships with the repo documenting every variable. Local dev uses a `.env` file (gitignored) loaded via `django-environ`.
+A `.env.example` ships with the repo documenting every variable. Local dev uses a `.env` file (gitignored), loaded by the project's small in-process dotenv helper in `core/settings/base.py`.
 
 ---
 
@@ -501,19 +544,28 @@ A `.env.example` ships with the repo documenting every variable. Local dev uses 
 All URLs are namespaced.
 
 ```python
-# core/urls.py
+# core/urls.py (representative; matches shipped handlers and main routes)
 from django.conf import settings
+from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
+from django.urls import include, path
+
+from core.sitemaps import AppSitemap, StaticViewSitemap
+from pages import views as page_views
+
+sitemaps = {"static": StaticViewSitemap, "apps": AppSitemap}
 
 urlpatterns = [
-    path(f'{settings.ADMIN_URL_PREFIX}/', admin.site.urls),
-    path('', include(('pages.urls', 'pages'), namespace='pages')),
-    path('apps/', include(('portfolio.urls', 'portfolio'), namespace='portfolio')),
-    path('sitemap.xml', sitemap_view, name='sitemap'),
-    path('robots.txt', robots_view, name='robots'),
+    path(f"{settings.ADMIN_URL_PREFIX.strip('/')}/", admin.site.urls),
+    path("", include(("pages.urls", "pages"), namespace="pages")),
+    path("apps/", include(("portfolio.urls", "portfolio"), namespace="portfolio")),
+    path("resume.pdf", page_views.resume_pdf, name="resume_pdf"),
+    path("robots.txt", page_views.robots_txt, name="robots"),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
 ]
 
-handler404 = 'pages.views.page_not_found'
-handler500 = 'pages.views.server_error'
+handler404 = "pages.views.page_not_found"
+handler500 = "pages.views.server_error"
 ```
 
 ```python
@@ -549,7 +601,7 @@ base.html
         └── portfolio/app_detail.html
 ```
 
-`base.html` defines the document skeleton: `<html>`, `<head>` with named blocks for title, meta description, OG tags, Twitter card, canonical URL; loads Tailwind, HTMX, and Lucide via CDN; defines CSS custom properties for design tokens; opens a single `{% block content %}` and `{% block scripts %}`.
+`base.html` defines the document skeleton: `<html>`, `<head>` with named blocks for title, meta description, OG tags, Twitter card, canonical URL; loads compiled Tailwind (`tw-compiled.css`) plus project CSS (`site.css`); loads HTMX and Lucide as self-hosted scripts from `static/vendor/` and a small `icons-init.js`; defines CSS custom properties for design tokens; opens a single `{% block content %}` and `{% block scripts %}`.
 
 `layouts/default.html` extends `base.html`, includes the navbar and footer components, wraps `{% block page_content %}` in the marketing-page container styling.
 
@@ -561,7 +613,6 @@ Page templates extend `layouts/default.html` and fill `{% block page_content %}`
 |---|---|---|
 | `navbar.html` | Top navigation | Uses `NAV_ITEMS` from context |
 | `footer.html` | Footer with links and version | Uses context processor values |
-| `cta_button.html` | Primary or secondary button | `label`, `href`, `variant` |
 | `status_badge.html` | App status pill | `status` |
 | `case_study_card.html` | Work history card on home | `case_study` (dataclass) |
 | `chip.html` | Capability / stack / concept chip | `label`, `variant` |
@@ -651,7 +702,7 @@ If JavaScript is disabled, the `<noscript>` fallback renders a real anchor link 
 
 ### Accessibility
 
-The HTMX-loaded content is announced to assistive technologies via an `aria-live="polite"` region wrapping the app list, so screen reader users hear new cards as they load.
+The HTMX-loaded content is announced to assistive technologies via an `aria-live="polite"` region wrapping the app list, so screen reader users hear new cards as they load. A regression test in `portfolio/tests/test_views.py` asserts the presence of `id="app-list"` and `aria-live="polite"` on the catalogue page, so the contract is enforced by CI.
 
 ---
 
@@ -661,7 +712,7 @@ This is the key architectural pattern for the technical-portfolio half of the si
 
 ### Convention
 
-Each app in Princeton's GitHub has a single Markdown documentation file at the repository root, named in lowercase snake_case with the suffix `_docs.md`:
+Each app in Princeton's GitHub has a single Markdown documentation file. The exact file URL is stored in `content/apps.yaml` as `docs_url` so the site does not have to infer paths for monorepo or renamed repositories. Most files follow the lowercase snake_case suffix convention:
 
 ```
 github.com/PrincetonAfeez/String-Sanitizer/blob/main/string_sanitizer_docs.md
@@ -703,10 +754,10 @@ H1 is reserved for the document title. Multiple H1s in a single document break s
 The app detail page renders five buttons. Each button is constructed via the `doc_url` template tag, which calls `App.doc_url(doc_type)`. The returned URL deep-links to the relevant H2 anchor on GitHub:
 
 ```
-{github_url}/blob/main/{docs_filename}#{anchor}
+{docs_url}#{anchor}
 ```
 
-Where `anchor` comes from the `App.DOC_ANCHORS` mapping (e.g., `'LESSONS_LEARNED' → 'lessons-learned'`).
+Where `docs_url` is the exact Markdown file URL stored in the manifest, and `anchor` comes from the `App.DOC_ANCHORS` mapping (e.g., `'LESSONS_LEARNED' → 'lessons-learned'`). If a legacy row does not have `docs_url`, the model falls back to `{github_url}/blob/main/{docs_filename}#{anchor}`.
 
 ### Source of truth
 
@@ -738,34 +789,32 @@ CSRF_COOKIE_SECURE = True
 
 ### Content Security Policy
 
-Via `django-csp`. Configured in `prod.py`:
+Via `django-csp` 4.x (`CONTENT_SECURITY_POLICY` dict). `csp` is appended to `INSTALLED_APPS` and `CSPMiddleware` is inserted **after** `WhiteNoiseMiddleware` in `prod.py` (following django-csp guidance) so responses that pass through both middlewares get CSP headers consistently — including any HTML inadvertently served via the static pipeline. This is additional defense-in-depth, not a claim that typical static files need CSP: most WhiteNoise responses are non-HTML assets, and CSP primarily governs HTML documents. Configured in `prod.py`:
 
 ```python
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = (
-    "'self'",
-    "https://unpkg.com",                  # HTMX
-    "https://cdn.tailwindcss.com",        # Tailwind Play CDN (v1 only)
-)
-CSP_STYLE_SRC = (
-    "'self'",
-    "'unsafe-inline'",                    # Required by Tailwind Play CDN
-    "https://cdn.tailwindcss.com",
-)
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "https://github.com",
-    "https://avatars.githubusercontent.com",
-)
-CSP_FONT_SRC = ("'self'", "data:")
-CSP_CONNECT_SRC = ("'self'",)
-CSP_FRAME_ANCESTORS = ("'none'",)
-CSP_BASE_URI = ("'self'",)
-CSP_FORM_ACTION = ("'self'",)
+from csp.constants import NONE, SELF
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [SELF],
+        "script-src": [SELF],
+        "style-src": [SELF],
+        "img-src": [
+            SELF,
+            "data:",
+            "https://github.com",
+            "https://avatars.githubusercontent.com",
+        ],
+        "font-src": [SELF, "data:"],
+        "connect-src": [SELF],
+        "frame-ancestors": [NONE],
+        "base-uri": [SELF],
+        "form-action": [SELF],
+    },
+}
 ```
 
-The `'unsafe-inline'` on `style-src` is a known trade-off of the Tailwind Play CDN. It is acceptable for v1 and removed in v1.1 when compiled Tailwind replaces the CDN. See ADR-0001 and a follow-up note in the v1.1 roadmap.
+Scripts and styles are limited to first-party static files: compiled Tailwind + `site.css`, and self-hosted HTMX / Lucide. The Tailwind Play CDN and a broad `style-src 'unsafe-inline'` allowance are not used. See ADR-0001.
 
 ### Admin protection
 
@@ -773,7 +822,7 @@ Django admin is enabled for content edits but is not the primary content workflo
 
 - Superuser credentials are strong (16+ char password, env-derived).
 - The admin URL is not the default `/admin/` — it is randomized via env (e.g., `/control-9aB4xQ/`) and documented in `.env.example` as a configuration value.
-- An IP allowlist middleware restricts admin access to Princeton's known IP addresses; non-allowlisted requests to admin URLs return 404.
+- An IP allowlist middleware (`AdminIPAllowlistMiddleware` in `core/middleware.py`) restricts admin access to Princeton's known IP addresses; non-allowlisted requests to admin URLs return 404. Production settings require a non-empty `ADMIN_ALLOWED_IPS` (startup fails with `ImproperlyConfigured` if unset or empty); a regression test in `core/tests/test_prod_settings.py` exercises this contract.
 
 ### Forms
 
@@ -812,7 +861,7 @@ Local terminals render human-readable text well. Log aggregators (Datadog, Loki,
 
 ### Error monitoring
 
-Sentry SDK initialized in `prod.py` only. Captures unhandled exceptions, 500-level responses, and a sample of performance traces. DSN from env. Free tier sufficient for portfolio traffic.
+Sentry SDK initialized in `prod.py` only. Captures unhandled exceptions, 500-level responses, and a 10% sample of performance traces (`traces_sample_rate=0.1`, `send_default_pii=False`). DSN from env. Free tier sufficient for portfolio traffic.
 
 ---
 
@@ -831,7 +880,7 @@ Sentry SDK initialized in `prod.py` only. Captures unhandled exceptions, 500-lev
 - **Image optimization:** all hero images converted to WebP with JPEG fallback via `<picture>`. All images carry `loading="lazy"` except the home page hero.
 - **HTMX over full-page navs:** the apps catalogue loads more content without a full page reload, reducing repeat asset downloads.
 - **No client-side framework:** zero JavaScript bundle beyond HTMX (~14KB gzipped).
-- **CDN-served Tailwind in v1:** acceptable trade-off for launch speed; compiled in v1.1 with PurgeCSS to ship only used utility classes.
+- **Compiled Tailwind in v1:** Tailwind 3 JIT scans Django templates and emits `tw-compiled.css`; content-hashed via WhiteNoise manifest storage in production.
 
 ---
 
@@ -852,7 +901,7 @@ Target: WCAG 2.1 Level AA.
 - All interactive elements reachable by keyboard.
 - Visible focus styles on every focusable element (custom focus ring on `:focus-visible`).
 - Buttons and links have accessible names. Icon-only buttons carry `aria-label`.
-- The HTMX-loaded app catalogue uses an `aria-live="polite"` region so new cards are announced.
+- The HTMX-loaded app catalogue uses an `aria-live="polite"` region so new cards are announced. A unit test asserts this region's presence and attributes; an `e2e/` Playwright + axe smoke test covers a broader set of page-level a11y checks.
 
 ### Visual
 
@@ -889,7 +938,7 @@ Implemented via named template blocks: `{% block title %}`, `{% block meta_descr
 
 ### Sitemap
 
-Generated by `django.contrib.sitemaps` with entries for: home, about, contact, every app detail page. Updated automatically when apps are added via the seed command.
+Sitemap classes live in `core/sitemaps.py` and are exposed via `core/urls.py` using `django.contrib.sitemaps`, with entries for: home, about, contact, every app detail page. Updated automatically when apps are added via the seed command.
 
 ### Robots
 
@@ -901,11 +950,17 @@ Generated by `django.contrib.sitemaps` with entries for: home, about, contact, e
 
 ### Framework
 
-`pytest` + `pytest-django` + `pytest-cov`. Tests live under `<app>/tests/`.
+`pytest` + `pytest-django` + `pytest-cov`. Tests live under `<app>/tests/`. Browser-based accessibility smoke checks live under `e2e/` using Playwright + axe-core.
 
-### Coverage target
+### Coverage
 
-70% line coverage minimum. Enforced in CI: the build fails if coverage drops below the threshold.
+70% line coverage minimum, enforced in CI. The build fails if coverage drops below that threshold. **Actual coverage at v1 launch is 87.9%**, with deliberate exclusions for:
+
+- Environment-specific settings files (`core/settings/dev.py`, `core/settings/prod.py`) — testing them would mostly re-assert literal values and provide false confidence.
+- WSGI/ASGI entrypoints (`core/wsgi.py`, `core/asgi.py`) and `manage.py` — Django boilerplate, tested upstream.
+- A handful of defensive error branches in middleware and 500 handler — fire on conditions that are hard to construct without contortion.
+
+The 70% floor is the safety net; 87.9% is the actual quality bar maintained by the test suite. New code that drops the number toward 70% should justify the dip in the same PR.
 
 ### Critical paths (must be covered)
 
@@ -918,6 +973,7 @@ Generated by `django.contrib.sitemaps` with entries for: home, about, contact, e
 | `app_list` view | 200 on full page request |
 | `app_list` view (HX-Request) | Returns partial template with correct content |
 | `app_list` view pagination | `?page=2` returns the right 10 apps |
+| `app_list` accessibility | `id="app-list"` and `aria-live="polite"` present on the list |
 | `app_detail` view | 200 for existing slug |
 | `app_detail` view | 404 for missing slug |
 | `home` view | 200, contains positioning line |
@@ -926,6 +982,8 @@ Generated by `django.contrib.sitemaps` with entries for: home, about, contact, e
 | `doc_url` template tag | Wraps `App.doc_url` correctly |
 | `seed_apps` command | Creates new apps from manifest |
 | `seed_apps` command | Updates existing apps idempotently |
+| `core.settings.prod` | Raises `ImproperlyConfigured` when `ADMIN_ALLOWED_IPS` is empty |
+| `AdminIPAllowlistMiddleware` | Returns 404 for non-allowlisted IPs hitting admin |
 | URL resolver | All named routes resolve |
 | 404 handler | Custom template renders |
 | 500 handler | Custom template renders |
@@ -994,7 +1052,7 @@ jobs:
 
 ### Deployment
 
-Railway auto-deploys from `main` when CI passes. The build command runs `pip install`, `collectstatic`, `migrate`, and `seed_apps`. The start command runs `gunicorn`.
+Railway auto-deploys from `main` when CI passes. The build command runs **`npm ci`** and **`npm run build:css`** (Tailwind → `static/css/tw-compiled.css`), then `pip install`, `collectstatic`, `migrate`, and `seed_apps` — matching `railway.toml`. The start command runs `gunicorn`.
 
 ---
 
@@ -1008,11 +1066,14 @@ Railway auto-deploys from `main` when CI passes. The build command runs `pip ins
    - `DJANGO_SETTINGS_MODULE = core.settings.prod`
    - `SECRET_KEY = <generated, 50+ chars>`
    - `ALLOWED_HOSTS = princetonafeez.com,www.princetonafeez.com`
+   - `CSRF_TRUSTED_ORIGINS = https://princetonafeez.com,https://www.princetonafeez.com`
    - `DEBUG = False`
    - `SENTRY_DSN = <from Sentry>`
    - `ADMIN_URL_PREFIX = control-<random>`
-4. Build command:
+   - `ADMIN_ALLOWED_IPS = <comma-separated IPs>` — **required** in production; startup fails if unset or empty (see §8 and `core/settings/prod.py`).
+4. Build command (same sequence as [`railway.toml`](../railway.toml) `buildCommand`; Nixpacks must have Node available for `npm`):
    ```
+   npm ci && npm run build:css && \
    pip install -r requirements/prod.txt && \
    python manage.py collectstatic --noinput && \
    python manage.py migrate && \
@@ -1023,6 +1084,29 @@ Railway auto-deploys from `main` when CI passes. The build command runs `pip ins
    gunicorn core.wsgi:application --workers 2 --bind 0.0.0.0:$PORT
    ```
 6. Custom domains: add `princetonafeez.com` and `www.princetonafeez.com`. Railway provides the target hostname.
+
+### Pre-deploy local rehearsal
+
+Before pushing changes that affect static assets or settings, rehearse the production pipeline locally:
+
+```bash
+DJANGO_SETTINGS_MODULE=core.settings.prod \
+  SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(64))") \
+  ALLOWED_HOSTS=localhost \
+  ADMIN_ALLOWED_IPS=127.0.0.1 \
+  DATABASE_URL=postgresql://localhost/portfolio_local \
+  python manage.py collectstatic --noinput
+```
+
+This exercises `CompressedManifestStaticFilesStorage` locally. Any template that references a missing static file surfaces here rather than mid-deploy on Railway.
+
+Also run Django's deployment lint:
+
+```bash
+DJANGO_SETTINGS_MODULE=core.settings.prod \
+  SECRET_KEY=... ALLOWED_HOSTS=princetonafeez.com ADMIN_ALLOWED_IPS=127.0.0.1 \
+  python manage.py check --deploy
+```
 
 ### GoDaddy DNS
 
@@ -1049,7 +1133,7 @@ The legacy 2020 JavaScript site is currently live at `princetonafeez.com`. To mi
 
 ### Source of truth
 
-The file `content/apps.yaml` in this repository is the canonical source of app metadata. It is version-controlled. Every app addition, status change, or stack update is a git commit. See ADR-0007.
+The file `content/apps.yaml` in this repository is the canonical source of app metadata and taxonomy metadata. It is version-controlled. Every change to the catalogue (new app, status update, stack revision, concept description) is a git commit. See ADR-0007.
 
 ### Manifest format
 
@@ -1111,7 +1195,7 @@ apps:
 - App rows are upserted by `slug`. Existing apps have their fields updated; new apps are created.
 - App `stack` and `concepts` values reference taxonomy slugs already defined in the same file.
 - The command is idempotent — running it twice yields the same state.
-- The command runs automatically after every deploy as part of the build command (added to the build line after `migrate`).
+- The command runs automatically after every deploy as part of the build command (after Tailwind compilation via npm, Python install, `collectstatic`, and `migrate`).
 
 ### Why a manifest and not the Django admin
 
@@ -1129,17 +1213,17 @@ The Django admin remains as an escape hatch for emergency edits, but the manifes
 
 ## 22. Architecture Decision Records
 
-Seven ADRs ship with v1, in `docs/adr/`. Each follows a standard format: **Status**, **Context**, **Decision**, **Consequences**, **Alternatives Considered**. Each is one to two pages.
+Seven ADRs ship with v1 as a single compendium, [`docs/ADRS.md`](ADRS.md). Each ADR is a top-level section (`## ADR 0001 — …` through `## ADR 0007 — …`) following the standard format: **Status**, **Context**, **Decision**, **Consequences**, **Alternatives Considered**. The file notes that entries may be split into individual files under `docs/adr/` later if maintenance prefers that layout; the v1 repo ships one markdown file for simpler navigation and diff review.
 
 | # | Title | Captures |
 |---|---|---|
-| 0001 | Django + HTMX monolith | Why Django, why HTMX, why not React/Next.js, why not a static site generator |
+| 0001 | Django + HTMX monolith | Why Django, why HTMX, why not React/Next.js, why not a static site generator; also captures compiled Tailwind and self-hosted HTMX/Lucide |
 | 0002 | PostgreSQL on Railway | Why Postgres in prod (not SQLite), why Railway over Fly/DO/Heroku, how the GoDaddy domain integrates |
-| 0003 | Five docs via GitHub deep links | Why not store doc content in the database, why H2 anchors over H1, why one file per app over five files |
+| 0003 | Five docs via GitHub deep links | Why not store doc content in the database, why H2 anchors over H1, why one file per app over five files, the `docs_url` override field |
 | 0004 | M2M for Stack and Concept | Why relational over free-text, even without v1 filtering |
 | 0005 | HTMX infinite scroll with pagination fallback | The progressive-enhancement pattern, the dual-purpose view, accessibility considerations |
 | 0006 | Logging strategy | JSON in prod, human-readable in dev, no file handler on Railway |
-| 0007 | Content sync via manifest | Why a YAML manifest is source of truth, not the Django admin |
+| 0007 | Content sync via manifest | Why a YAML manifest is source of truth, not the Django admin; top-level `stacks` and `concepts` taxonomy |
 
 These ADRs are themselves a portfolio artifact. They demonstrate trade-off analysis applied to this project, mirroring the discipline of the five docs per catalogued app.
 
@@ -1150,7 +1234,6 @@ These ADRs are themselves a portfolio artifact. They demonstrate trade-off analy
 The following are explicitly out of scope for v1. Most appear in the roadmap below.
 
 - Filtering or search on the apps catalogue
-- Compiled Tailwind (Play CDN ships in v1)
 - Docker / containerization
 - A blog or long-form writing section beyond ADRs
 - Analytics
@@ -1169,9 +1252,8 @@ The following are explicitly out of scope for v1. Most appear in the roadmap bel
 
 ## 24. Roadmap
 
-### v1.1 — Hardening
+### v1.1 — Catalogue navigation
 
-- Replace Tailwind Play CDN with a compiled Tailwind build. Remove `'unsafe-inline'` from `style-src`. Add a `tailwind.config.js`, run PurgeCSS, commit the compiled CSS.
 - Add filter chips on `/apps/` (filter by stack, by status). Update the `app_list` view to honor query parameters. Update the HTMX infinite-scroll URL construction to preserve filters across loads.
 - Add a search box on `/apps/` (server-side `icontains` query, no full-text indexing needed at this scale).
 
@@ -1191,15 +1273,15 @@ The following are explicitly out of scope for v1. Most appear in the roadmap bel
 
 ## 25. Open Items and Assumptions
 
-The following are assumptions made during this specification. Each should be confirmed before v1 build begins; any change invalidates downstream decisions.
+The following were assumptions during specification. Items marked **Confirmed** or **Resolved** are closed for v1; remaining items should still be validated when circumstances change.
 
-1. **All 40 existing docs files follow the convention** `{name_in_snake_case}_docs.md` at the repository root, with five H2 section headings (`## ADR`, `## TDD`, `## IDS`, `## Runbook`, `## Lessons Learned`). Confirmed by Princeton.
-2. **The default branch on every app repository is `main`**, not `master`. Confirmed by Princeton.
-3. **Princeton's GitHub username is `PrincetonAfeez`**, as referenced on the existing portfolio site. To be confirmed before the seed manifest is populated.
-4. **The site contact email is `princetonafeez@gmail.com`**, distinct from the resume's `Papresents@gmail.com`. Confirmed by Princeton.
-5. **The headshot at `http://www.princetonafeez.com/images/glint_about_1.jpg`** will be downloaded and committed to the new repository as a static asset. The legacy site will be decommissioned, so the URL must not remain a runtime dependency.
-6. **The current professional role is Interim General Manager at Crawford's Social**, per the attached resume dated 2026. If a different current role is appropriate at launch time, the home page hero copy should be updated before deployment.
-7. **The site is launched at `princetonafeez.com`**, replacing the existing 2020 JavaScript site. DNS at GoDaddy will be updated to point at Railway.
+1. **Confirmed (v1).** All 40 existing docs files follow the convention `{name_in_snake_case}_docs.md` at the repository root, with five H2 section headings (`## ADR`, `## TDD`, `## IDS`, `## Runbook`, `## Lessons Learned`).
+2. **Confirmed (v1).** The default branch on every app repository is `main`, not `master`.
+3. **Confirmed (v1).** Princeton's GitHub username is `PrincetonAfeez`. The seed manifest (`content/apps.yaml`) and app catalogue URLs use this organization consistently.
+4. **Confirmed (v1).** The site contact email is `princetonafeez@gmail.com`, distinct from the resume's `Papresents@gmail.com`.
+5. **Resolved (v1).** The headshot is committed in-repo at `static/img/headshot.png` and is not loaded from the legacy site at runtime.
+6. **Open.** The current professional role is Interim General Manager at Crawford's Social, per the attached resume dated 2026. If a different current role is appropriate at launch time, the home page hero copy should be updated before deployment.
+7. **Open until cutover.** The site is launched at `princetonafeez.com`, replacing the existing 2020 JavaScript site. DNS at GoDaddy will be updated to point at Railway as the final step of the cutover plan.
 
 ---
 
