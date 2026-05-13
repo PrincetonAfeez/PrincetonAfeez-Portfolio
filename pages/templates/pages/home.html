@@ -1,0 +1,32 @@
+{% extends "layouts/default.html" %}
+{% block title %}Princeton Afeez | Hospitality Operator & Python Systems Portfolio{% endblock %}
+{% block meta_description %}
+    Senior hospitality operator in Los Angeles with 35 years in bars, clubs and restaurants, 15+ years of multi-unit P&L ownership, and a growing Python systems portfolio.
+{% endblock %}
+{% block structured_data %}
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Princeton Afeez",
+  "jobTitle": "Senior General Manager",
+  "email": "mailto:{{ CONTACT_EMAIL }}",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Los Angeles",
+    "addressRegion": "CA",
+    "addressCountry": "US"
+  },
+  "sameAs": ["{{ LINKEDIN_URL }}", "{{ GITHUB_URL }}"]
+}
+    </script>
+{% endblock %}
+{% block page_content %}
+    {% include "sections/hero.html" %}
+    {% include "sections/about.html" %}
+    {% include "sections/work_history.html" %}
+    {% include "sections/capabilities.html" %}
+    {% include "sections/certifications.html" %}
+    {% include "sections/tech_chapter.html" %}
+    {% include "sections/contact.html" %}
+{% endblock %}

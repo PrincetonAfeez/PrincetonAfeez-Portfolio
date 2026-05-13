@@ -1,0 +1,23 @@
+{% extends "layouts/default.html" %}
+{% block title %}About | Princeton Afeez{% endblock %}
+{% block meta_description %}
+    Long-form background on Princeton Afeez: hospitality operations, multi-unit leadership, and the current Python systems chapter.
+{% endblock %}
+{% block page_content %}
+    <section class="section-band bg-white">
+        <div class="section-inner max-w-4xl">
+            <p class="section-kicker">About</p>
+            <h1 class="section-title">From Lagos to London to Los Angeles, the work has always been systems.</h1>
+            <div class="mt-8 space-y-5 text-base leading-8 text-[var(--color-ink)]">
+                <p>
+                    Princeton Afeez has spent 35 years operating bars, clubs and restaurants, cafes, lounges, and catering operations, with more than a decade of multi-unit P&amp;L ownership in Los Angeles.
+                </p>
+                <p>
+                    The current chapter adds Python and system architecture to that operating foundation. The portfolio catalogue documents that learning through small shipped applications and the written discipline around them.
+                </p>
+            </div>
+        </div>
+    </section>
+    {% include "sections/work_history.html" %}
+    {% include "sections/capabilities.html" %}
+{% endblock %}
