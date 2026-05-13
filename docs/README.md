@@ -2,7 +2,7 @@
 
 A personal portfolio site that catalogues a hospitality operator's transition into Python and system architecture. Built as a Django + HTMX monolith, deployed to Railway, served at [princetonafeez.com](https://princetonafeez.com).
 
-[![CI](https://github.com/PrincetonAfeez/princetonafeez.com/actions/workflows/ci.yml/badge.svg)](https://github.com/PrincetonAfeez/princetonafeez.com/actions/workflows/ci.yml)
+[![CI](https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![Django](https://img.shields.io/badge/django-5.0-green.svg)](https://www.djangoproject.com/)
 [![Coverage](https://img.shields.io/badge/coverage-70%25%2B-brightgreen.svg)](#testing)
@@ -117,8 +117,8 @@ Prerequisites:
 Clone and set up:
 
 ```bash
-git clone https://github.com/PrincetonAfeez/princetonafeez.com.git
-cd princetonafeez.com
+git clone https://github.com/PrincetonAfeez/PrincetonAfeez-Portfolio.git
+cd PrincetonAfeez-Portfolio
 
 python -m venv .venv
 source .venv/bin/activate            # macOS / Linux
@@ -148,7 +148,7 @@ The default settings module for local development is `core.settings.dev`. It use
 ## Project structure
 
 ```
-princetonafeez.com/
+PrincetonAfeez-Portfolio/
 ├── .env.example                     # Documented env vars (gitignored .env in practice)
 ├── .github/workflows/ci.yml         # GitHub Actions CI pipeline
 ├── content/apps.yaml                # Canonical catalogue manifest (source of truth)
