@@ -1,0 +1,59 @@
+[project]
+name = "princetonafeez-portfolio"
+version = "0.1.0"
+description = "Production Django + HTMX portfolio for Princeton Afeez"
+requires-python = ">=3.12"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = """
+/(
+  node_modules
+  | staticfiles
+)/
+"""
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "node_modules",
+    "staticfiles",
+    "**/migrations/**",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "DJ"]
+ignore = ["DJ001"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.settings.test"
+python_files = ["test_*.py", "*_test.py"]
+testpaths = ["core/tests", "e2e", "pages/tests", "portfolio/tests"]
+addopts = "-ra"
+norecursedirs = [".git", ".venv", "venv", "node_modules", "staticfiles", "build", "dist"]
+
+[tool.coverage.run]
+source = ["core", "pages", "portfolio"]
+omit = ["*/migrations/*", "*/tests/*"]
+
+[tool.coverage.report]
+precision = 1
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+
+[tool.djlint]
+profile = "django"
+indent = 4
+extension = "html"
